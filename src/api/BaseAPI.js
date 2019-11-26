@@ -17,7 +17,7 @@ export default {
 
     return axios({
       method: 'POST',
-      url: 'http://144.217.243.144:9090/api/oauth2/token',
+      url: 'http://demo3099111.mockable.io/',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
@@ -27,8 +27,8 @@ export default {
     .catch(error => { throw error });
   },
   onGetUserInfo: (token) => {
-    return axios('http://144.217.243.144:9090/api/user', {
-      method: 'GET',
+    return axios('http://demo3099111.mockable.io/', {
+      method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token
       },
