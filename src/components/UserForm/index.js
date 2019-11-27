@@ -3,6 +3,7 @@ import "./UserForm.css";
 // API
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCoffee } from "@fortawesome/free-solid-svg-icons";
+import { axios } from "axios";
 
 export default class UserForm extends Component {
   constructor(props) {
@@ -29,12 +30,12 @@ export default class UserForm extends Component {
       userDetails: [
         {
           billableID: "",
-          phoneNumber: "",
+          billablePhoneNumber: "",
           planID: "",
           cirlce: "",
-          firstName: "",
-          lastName: "",
-          emailID: ""
+          billablefirstName: "",
+          billableLastName: "",
+          billableEmailID: ""
         }
       ]
     };
@@ -42,10 +43,28 @@ export default class UserForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    alert("handleSubmit");
+
+    axios
+      .post(`http://demo3099111.mockable.io/`, { ...this.state })
+      .then(res => {
+        alert("Data has reached server");
+        console.log(res);
+        console.log(res.data);
+      });
   };
 
-  handleChange = (event, type) => {
+  handleBillableFormChange = (index, event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    let userDetails = [...this.state.userDetails];
+    userDetails[index] = { ...userDetails[index], [name]: value };
+    // debugger;
+    this.setState({
+      userDetails: [...userDetails]
+    });
+  };
+
+  handleChange = event => {
     const name = event.target.name;
     const value = event.target.value;
 
@@ -62,30 +81,66 @@ export default class UserForm extends Component {
   handleAdd = () => {
     const newUserDetails = {
       billableID: "",
-      phoneNumber: "",
+      billablePhoneNumber: "",
       planID: "",
       cirlce: "",
-      firstName: "",
-      lastName: "",
-      emailID: ""
+      billablefirstName: "",
+      billableLastName: "",
+      billableEmailID: ""
     };
     // alert("Call Verification API");
     this.setState(prevState => {
       return {
-        userDetails: [{ ...newUserDetails }, ...prevState.userDetails]
+        userDetails: [...prevState.userDetails, { ...newUserDetails }]
       };
     });
   };
   renderDynamicFormFields() {
+    // debugger;
     return this.state.userDetails.map((item, index) => (
       <div className="customer">
-        <input className="billable-id" type="text" />
-        <input className="phone-number" type="tel" />
-        <input className="plan-id" type="text" />
-        <input className="cirlce" type="text" />
-        <input className="first-name" type="text" />
-        <input className="last-name" type="text" />
-        <input className="email-id" type="text" />
+        <input
+          className="billable-id"
+          name="billableID"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          type="text"
+        />
+        <input
+          className="phone-number"
+          name="billablePhoneNumber"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          type="tel"
+        />
+        <input
+          className="plan-id"
+          name="planID"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          type="text"
+        />
+        <input
+          className="cirlce"
+          name="cirlce"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          type="text"
+        />
+        <input
+          className="first-name"
+          name="billablefirstName"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          type="text"
+        />
+        <input
+          className="last-name"
+          name="billableLastName"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          type="text"
+        />
+        <input
+          className="email-id"
+          name="billableEmailID"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          type="text"
+        />
         <br />
       </div>
     ));
@@ -300,13 +355,7 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
               />
               <br />
-              <label>(All fields are mandatory)</label>
-              <input
-                className="separatingMargin"
-                type="submit"
-                defaultValue="Submit"
-              />
-              <br />
+              {/* <label>(All fields are mandatory)</label> */}
             </form>
           </div>
         </div>
@@ -325,6 +374,13 @@ export default class UserForm extends Component {
             <button className="addNew" onClick={this.handleAdd}>
               Add New
             </button>
+            <br />
+            <input
+              className="submitBtn separatingMargin"
+              type="submit"
+              defaultValue="Submit"
+            />
+            <br />
           </div>
         </div>
       </div>
