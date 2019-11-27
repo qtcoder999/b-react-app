@@ -1,0 +1,37 @@
+this.state = {
+  companyInfo: {
+    domain: "",
+    organizationName: "",
+    contactName: "",
+    addressLine1: "",
+    addressLine2: "",
+    country: "",
+    region: "",
+    city: "",
+    postalCode: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    alternateEmail: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    customerPartyAccountName: "",
+    customerPartyAccountID: "",
+  },
+  userDetails: [
+    {
+      billableID: "",
+      billablePhoneNumber: "",
+      planID: "",
+      cirlce: "",
+      billablefirstName: "",
+      billableLastName: "",
+      billableEmailID: "",
+    }
+  ],
+  isFormSubmitting: false,
+  isVerifying: false,
+  hasVerified: false,
+  isAnyFieldEmpty: false
+};

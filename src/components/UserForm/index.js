@@ -43,9 +43,11 @@ export default class UserForm extends Component {
       ],
       isFormSubmitting: false,
       isVerifying: false,
-      hasVerified: false,
-      formFieldsValid: false
+      hasVerified: false
     };
+    this.isAnyFieldEmpty = false;
+    this.handleSubmit = this.handleSubmit.bind(this);
+
     // this.state = {
     //   companyInfo: {
     //     domain: "",
@@ -80,33 +82,65 @@ export default class UserForm extends Component {
     // };
   }
 
+  process = (key, value) => {
+    if (value == "") {
+      this.isAnyFieldEmpty = true;
+      alert(key + "field is empty.");
+      console.log(key + " : " + value + "is blank");
+    }
+  };
+
+  traverse = (o, func) => {
+    for (var i in o) {
+      func.apply(this, [i, o[i]]);
+      if (o[i] !== null && typeof o[i] == "object") {
+        this.traverse(o[i], func);
+      }
+    }
+  };
+
   handleSubmit = event => {
     event.preventDefault();
+    console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
+    this.isAnyFieldEmpty = false;
+    this.traverse(
+      { ...this.state.companyInfo, ...this.state.userDetails },
+      this.process
+    );
 
-    this.setState({ isFormSubmitting: true });
-    const { companyInfo } = this.state;
-    delete companyInfo.confirmPassword;
-    axios
-      .post(`http://demo0073795.mockable.io/formData`, {
-        ...this.state.companyInfo,
-        ...this.state.userDetails
-      })
-      .then(response => {
-        alert("Message from server: " + response.data.message);
-      })
-      .catch(error => {
-        console.log(error);
+    const { password, confirmPassword } = this.state.companyInfo;
 
-        alert("Submission unsuccessful.");
-      })
-      .finally(() => {
-        // always executed
-        this.setState({ isFormSubmitting: false });
-      });
+    if (password !== confirmPassword) {
+      alert("Passwords don't match.");
+    }
+    if (!this.state.hasVerified) {
+      alert("Domain not verified.");
+    }
+    console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
 
-    // axios.interceptors.request.use(function() {
-    //   console.log("Request ongoing");
-    // });
+    if (!this.isAnyFieldEmpty && this.state.hasVerified) {
+      this.setState({ isFormSubmitting: true });
+      const newState = JSON.parse(JSON.stringify(this.state))
+      const { companyInfo } = newState;
+      delete companyInfo.confirmPassword;
+      axios
+        .post(`http://demo0073795.mockable.io/formData`, {
+          ...newState.companyInfo,
+          ...newState.userDetails
+        })
+        .then(response => {
+          alert("Message from server: " + response.data.message);
+        })
+        .catch(error => {
+          console.log(error);
+          alert("Submission unsuccessful.");
+        })
+        .finally(() => {
+          this.setState({ isFormSubmitting: false });
+        });
+    } else {
+      // alert("Data is not valid. Please check the entered data.");
+    }
   };
 
   handleBillableFormChange = (index, event) => {
@@ -255,8 +289,9 @@ export default class UserForm extends Component {
       </div>
     ));
   }
+
   static getDerivedStateFromProps(props, state) {
-    console.clear();
+    // console.clear();
     console.log(JSON.stringify(state, null, 2));
   }
 
