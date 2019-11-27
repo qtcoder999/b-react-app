@@ -43,7 +43,8 @@ input[type="text"],
 input[type="tel"],
 select,
 textarea,
-input[type="number"] {
+input[type="number"],
+input[type="password"] {
   padding: 6px 6px;
   border: 1px solid #ddd;
   -webkit-appearance: none;
@@ -55,15 +56,6 @@ input[type="number"] {
   display: inline-block;
   width: 400px;
   background-color: #f2f2f2;
-}
-
-input[type="submit"] {
-  background-color: #d40324;
-  color: white;
-  padding: 6px 28px;
-  border: none;
-  cursor: pointer;
-  font-size: 12px;
 }
 
 .container {
@@ -165,6 +157,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 .addNew {
   margin-top: 10px;
+  margin-right: 5px;
   padding: 6px 28px;
   background-color: blue;
   color: #fff;
@@ -172,6 +165,23 @@ input[type="number"]::-webkit-outer-spin-button {
   border: none;
 }
 .submitBtn {
+  background-color: #d40324;
+  color: white;
+  padding: 7px 27px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
   display: table !important;
-  margin: 6px auto !important;
+  margin: 0 auto !important;
+  margin-top: 30px !important;
+}
+.addButton {
+  background-color: #d40324;
+  color: white;
+  padding: 6px 27px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+  outline: none;
 }

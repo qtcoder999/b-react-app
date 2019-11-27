@@ -2,69 +2,128 @@ import React, { Component } from "react";
 import "./UserForm.css";
 // API
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoffee } from "@fortawesome/free-solid-svg-icons";
-import { axios } from "axios";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+// import Loader from "react-loader-spinner";
 
 export default class UserForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
       companyInfo: {
-        domain: "",
-        organizationName: "",
-        contactName: "",
-        addressLine1: "",
-        addressLine2: "",
+        domain: "parasTesting.com",
+        organizationName: "Airtel Enterprises",
+        contactName: "Bharti Airtel Pvt. Ltd.",
+        addressLine1: "Plot No. 16",
+        addressLine2: "Udyog Vihar",
         country: "IN",
-        region: "",
-        city: "",
-        postalCode: "",
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        alternateEmail: "",
-        username: "",
-        customerPartyAccountName: "",
-        customerPartyAccountID: ""
+        region: "Delhi",
+        city: "New Delhi",
+        postalCode: "110063",
+        firstName: "Bharti Airtel",
+        lastName: "Ltd.",
+        phoneNumber: "9818156333",
+        alternateEmail: "paras@unifytech.com",
+        username: "testparas",
+        password: "",
+        confirmPassword: "",
+        customerPartyAccountName: "Paras Anand",
+        customerPartyAccountID: "12123123"
       },
       userDetails: [
         {
-          billableID: "",
-          billablePhoneNumber: "",
-          planID: "",
-          cirlce: "",
-          billablefirstName: "",
-          billableLastName: "",
-          billableEmailID: ""
+          billableID: "paras@unify.com",
+          billablePhoneNumber: "09818156333",
+          planID: "paras@unify.com",
+          cirlce: "paras@unify.com",
+          billablefirstName: "paras@unify.com",
+          billableLastName: "paras@unify.com",
+          billableEmailID: "paras@unify.com"
         }
-      ]
+      ],
+      isFormSubmitting: false,
+      isVerifying: false,
+      hasVerified: false,
+      formFieldsValid: false
     };
+    // this.state = {
+    //   companyInfo: {
+    //     domain: "",
+    //     organizationName: "",
+    //     contactName: "",
+    //     addressLine1: "",
+    //     addressLine2: "",
+    //     country: "IN",
+    //     region: "",
+    //     city: "",
+    //     postalCode: "",
+    //     firstName: "",
+    //     lastName: "",
+    //     phoneNumber: "",
+    //     alternateEmail: "",
+    //     username: "",
+    //     password: "",
+    //     customerPartyAccountName: "",
+    //     customerPartyAccountID: ""
+    //   },
+    //   userDetails: [
+    //     {
+    //       billableID: "",
+    //       billablePhoneNumber: "",
+    //       planID: "",
+    //       cirlce: "",
+    //       billablefirstName: "",
+    //       billableLastName: "",
+    //       billableEmailID: ""
+    //     }
+    //   ]
+    // };
   }
 
   handleSubmit = event => {
     event.preventDefault();
 
+    this.setState({ isFormSubmitting: true });
+    const { companyInfo } = this.state;
+    delete companyInfo.confirmPassword;
     axios
-      .post(`http://demo3099111.mockable.io/`, { ...this.state })
-      .then(res => {
-        alert("Data has reached server");
-        console.log(res);
-        console.log(res.data);
+      .post(`http://demo0073795.mockable.io/formData`, {
+        ...this.state.companyInfo,
+        ...this.state.userDetails
+      })
+      .then(response => {
+        alert("Message from server: " + response.data.message);
+      })
+      .catch(error => {
+        console.log(error);
+
+        alert("Submission unsuccessful.");
+      })
+      .finally(() => {
+        // always executed
+        this.setState({ isFormSubmitting: false });
       });
+
+    // axios.interceptors.request.use(function() {
+    //   console.log("Request ongoing");
+    // });
   };
 
   handleBillableFormChange = (index, event) => {
+    event.preventDefault();
+
     const name = event.target.name;
     const value = event.target.value;
     let userDetails = [...this.state.userDetails];
     userDetails[index] = { ...userDetails[index], [name]: value };
-    // debugger;
     this.setState({
       userDetails: [...userDetails]
     });
   };
 
   handleChange = event => {
+    event.preventDefault();
+
     const name = event.target.name;
     const value = event.target.value;
 
@@ -78,7 +137,32 @@ export default class UserForm extends Component {
     });
   };
 
-  handleAdd = () => {
+  handleCheckDomain = event => {
+    event.preventDefault();
+
+    const { domain } = this.state;
+    this.setState({ isVerifying: true });
+    axios
+      .post(`http://demo0073795.mockable.io/verificationStatus`, {
+        domain
+      })
+      .then(response => {
+        this.setState({ hasVerified: true });
+        // alert("Message from server: " + response.data.verificationStatus);
+      })
+      .catch(error => {
+        this.setState({ hasVerified: false });
+        console.log(error);
+        alert("Verification unsuccessful");
+      })
+      .finally(() => {
+        this.setState({ isVerifying: false });
+      });
+  };
+
+  handleAdd = event => {
+    event.preventDefault();
+
     const newUserDetails = {
       billableID: "",
       billablePhoneNumber: "",
@@ -95,51 +179,77 @@ export default class UserForm extends Component {
       };
     });
   };
+
+  handleRemove = event => {
+    event.preventDefault();
+
+    let userDetails = [...this.state.userDetails]; // make a separate copy of the array
+    userDetails.splice(-1, 1);
+    this.setState({ userDetails });
+  };
+
   renderDynamicFormFields() {
     // debugger;
+    const { userDetails } = this.state;
     return this.state.userDetails.map((item, index) => (
-      <div className="customer">
+      <div className="customer" key={index}>
         <input
           className="billable-id"
           name="billableID"
           onChange={this.handleBillableFormChange.bind(this, index)}
+          value={userDetails[index] ? userDetails[index].billableID : ""}
           type="text"
+          required
         />
         <input
           className="phone-number"
           name="billablePhoneNumber"
           onChange={this.handleBillableFormChange.bind(this, index)}
+          value={
+            userDetails[index] ? userDetails[index].billablePhoneNumber : ""
+          }
           type="tel"
+          required
         />
         <input
           className="plan-id"
           name="planID"
           onChange={this.handleBillableFormChange.bind(this, index)}
+          value={userDetails[index] ? userDetails[index].planID : ""}
           type="text"
+          required
         />
         <input
           className="cirlce"
           name="cirlce"
           onChange={this.handleBillableFormChange.bind(this, index)}
+          value={userDetails[index] ? userDetails[index].cirlce : ""}
           type="text"
+          required
         />
         <input
           className="first-name"
           name="billablefirstName"
           onChange={this.handleBillableFormChange.bind(this, index)}
+          value={userDetails[index] ? userDetails[index].billablefirstName : ""}
           type="text"
+          required
         />
         <input
           className="last-name"
           name="billableLastName"
           onChange={this.handleBillableFormChange.bind(this, index)}
+          value={userDetails[index] ? userDetails[index].billableLastName : ""}
           type="text"
+          required
         />
         <input
           className="email-id"
           name="billableEmailID"
           onChange={this.handleBillableFormChange.bind(this, index)}
+          value={userDetails[index] ? userDetails[index].billableEmailID : ""}
           type="text"
+          required
         />
         <br />
       </div>
@@ -151,7 +261,7 @@ export default class UserForm extends Component {
   }
 
   render() {
-    const { companyInfo } = this.state;
+    const { companyInfo, hasVerified, isVerifying } = this.state;
     return (
       <div>
         <div className="headingContainer">
@@ -174,7 +284,7 @@ export default class UserForm extends Component {
         </div>
         <div className="container">
           <div className="sub-container">
-            <form onSubmit={this.handleSubmit}>
+            <form>
               <label>Customer party account name</label>
               <input
                 type="text"
@@ -183,6 +293,7 @@ export default class UserForm extends Component {
                 placeholder="Enter your customer party account name"
                 value={companyInfo.customerPartyAccountName}
                 onChange={this.handleChange}
+                required
               />
               <br />
               <label>Customer party account ID</label>
@@ -193,6 +304,7 @@ export default class UserForm extends Component {
                 placeholder="Enter your customer party account ID"
                 value={companyInfo.customerPartyAccountID}
                 onChange={this.handleChange}
+                required
               />
               <br />
               <label>Domain</label>
@@ -204,17 +316,30 @@ export default class UserForm extends Component {
                 placeholder="Enter your organisation’s domain"
                 value={companyInfo.domain}
                 onChange={this.handleChange}
+                required
               />
-              {/* <button
-                className="addButton"
-                onClick={this.handleAdd}
-                value="Add"
-              >
-                Add
-              </button>
-              <button onClick={this.handleAdd} value="Add">
-                Cancel
-              </button> */}
+              {!hasVerified ? (
+                <React.Fragment>
+                  <button
+                    type="button"
+                    className="addButton"
+                    onClick={isVerifying ? null : this.handleCheckDomain}
+                    value="Check"
+                  >
+                    Check
+                  </button>
+                  {/* <button
+                    type="button"
+                    onClick={isVerifying ? null : this.handleCheckDomain}
+                    value="Add"
+                  >
+                    Cancel
+                  </button> */}
+                </React.Fragment>
+              ) : (
+                <FontAwesomeIcon icon={faCheckCircle} />
+              )}
+
               <br />
               <label>Organization Name</label>
               <input
@@ -223,6 +348,7 @@ export default class UserForm extends Component {
                 name="organizationName"
                 value={companyInfo.organizationName}
                 onChange={this.handleChange}
+                required
               />
               <br />
               <div className="separatingMargin">
@@ -235,6 +361,7 @@ export default class UserForm extends Component {
                     placeholder="Contact Name"
                     value={companyInfo.contactName}
                     onChange={this.handleChange}
+                    required
                   />
                   <br />
                   <input
@@ -244,6 +371,7 @@ export default class UserForm extends Component {
                     placeholder="Street Address Line 1"
                     value={companyInfo.addressLine1}
                     onChange={this.handleChange}
+                    required
                   />
                   <br />
                   <input
@@ -253,6 +381,7 @@ export default class UserForm extends Component {
                     placeholder="Street Address Line 2"
                     value={companyInfo.addressLine2}
                     onChange={this.handleChange}
+                    required
                   />
                   {/* <input
                     type="text"
@@ -268,6 +397,7 @@ export default class UserForm extends Component {
                     name="country"
                     onChange={this.handleChange}
                     value={companyInfo.country}
+                    required
                   >
                     <option value="IN">India</option>
                     <option value="AUS">Australia</option>
@@ -282,6 +412,7 @@ export default class UserForm extends Component {
                     placeholder="Enter State"
                     value={companyInfo.region}
                     onChange={this.handleChange}
+                    required
                   />
                   <input
                     className="oneThirdWidth"
@@ -291,6 +422,7 @@ export default class UserForm extends Component {
                     placeholder="Enter City"
                     value={companyInfo.city}
                     onChange={this.handleChange}
+                    required
                   />
                   <input
                     type="number"
@@ -300,6 +432,7 @@ export default class UserForm extends Component {
                     placeholder="Enter Pin Code"
                     value={companyInfo.postalCode}
                     onChange={this.handleChange}
+                    required
                   />
                   <input
                     type="tel"
@@ -309,6 +442,7 @@ export default class UserForm extends Component {
                     placeholder="Enter Phone Number"
                     value={companyInfo.phoneNumber}
                     onChange={this.handleChange}
+                    required
                   />
                   <br />
                 </span>
@@ -323,6 +457,7 @@ export default class UserForm extends Component {
                 placeholder="First Name"
                 value={companyInfo.firstName}
                 onChange={this.handleChange}
+                required
               />
               <input
                 className="halfWidth"
@@ -332,6 +467,7 @@ export default class UserForm extends Component {
                 placeholder="Last Name"
                 value={companyInfo.lastName}
                 onChange={this.handleChange}
+                required
               />
               <br />
               <label>Admin Username</label>
@@ -342,8 +478,31 @@ export default class UserForm extends Component {
                 name="username"
                 value={companyInfo.username}
                 onChange={this.handleChange}
+                required
               />
               <span className="domain-name"> @{companyInfo.domain} </span>
+              <br />
+              <label>Admin Password</label>
+              <input
+                type="password"
+                className="halfWidth"
+                id="password"
+                name="password"
+                value={companyInfo.password}
+                onChange={this.handleChange}
+                required
+              />
+              <br />
+              <label>Admin Confirm Password</label>
+              <input
+                type="password"
+                className="halfWidth"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={companyInfo.confirmPassword}
+                onChange={this.handleChange}
+                required
+              />
               <br />
               <label>Alternate Email</label>
               <input
@@ -353,6 +512,7 @@ export default class UserForm extends Component {
                 value={companyInfo.alternateEmail}
                 placeholder="Enter email address that's not in above entered domain"
                 onChange={this.handleChange}
+                required
               />
               <br />
               {/* <label>(All fields are mandatory)</label> */}
@@ -370,17 +530,30 @@ export default class UserForm extends Component {
               <span className="last-name">Last Name</span>
               <span className="email-id">Email ID</span>
             </div>
-            {this.renderDynamicFormFields()}
-            <button className="addNew" onClick={this.handleAdd}>
+            <form>{this.renderDynamicFormFields()}</form>
+            <button type="button" className="addNew" onClick={this.handleAdd}>
               Add New
+            </button>
+            <button
+              type="button"
+              className="addNew"
+              onClick={
+                this.state.userDetails.length > 1 ? this.handleRemove : null
+              }
+            >
+              Remove
             </button>
             <br />
             <input
-              className="submitBtn separatingMargin"
+              className="submitBtn"
               type="submit"
               defaultValue="Submit"
+              onClick={!this.state.isFormSubmitting ? this.handleSubmit : null}
             />
             <br />
+            {/* {this.state.isFormSubmitting ? (
+              <Loader type="Puff" color="#00BFFF" height={50} width={50} />
+            ) : null} */}
           </div>
         </div>
       </div>
