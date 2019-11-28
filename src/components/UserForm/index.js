@@ -4,89 +4,95 @@ import "./UserForm.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import SHA1 from "crypto-js/sha1";
+
 // import Loader from "react-loader-spinner";
 
 export default class UserForm extends Component {
   constructor(props) {
     super(props);
+    // this.state = {
+    //   companyInfo: {
+    //     domain: "parasTesting.com",
+    //     organizationName: "Airtel Enterprises",
+    //     contactName: "Bharti Airtel Pvt. Ltd.",
+    //     addressLine1: "Plot No. 16",
+    //     addressLine2: "Udyog Vihar",
+    //     country: "IN",
+    //     region: "Delhi",
+    //     city: "New Delhi",
+    //     postalCode: "110063",
+    //     firstName: "Bharti Airtel",
+    //     lastName: "Ltd.",
+    //     phoneNumber: "9818156333",
+    //     alternateEmail: "paras@unifytech.com",
+    //     username: "testparas",
+    //     password: "",
+    //     confirmPassword: "",
+    //     customerPartyAccountName: "Paras Anand",
+    //     customerPartyAccountID: "12123123"
+    //   },
+    //   userDetails: [
+    //     {
+    //       billableID: "paras@unify.com",
+    //       billablePhoneNumber: "09818156333",
+    //       planID: "paras@unify.com",
+    //       cirlce: "paras@unify.com",
+    //       billablefirstName: "paras@unify.com",
+    //       billableLastName: "paras@unify.com",
+    //       billableEmailID: "paras@unify.com"
+    //     }
+    //   ],
+    //   isFormSubmitting: false,
+    //   isVerifying: false,
+    //   hasVerified: false
+    // };
+    this.isAnyFieldEmpty = false;
+    this.handleSubmit = this.handleSubmit.bind(this);
+
     this.state = {
       companyInfo: {
-        domain: "parasTesting.com",
-        organizationName: "Airtel Enterprises",
-        contactName: "Bharti Airtel Pvt. Ltd.",
-        addressLine1: "Plot No. 16",
-        addressLine2: "Udyog Vihar",
+        domain: "",
+        organizationName: "",
+        contactName: "",
+        addressLine1: "",
+        addressLine2: "",
         country: "IN",
-        region: "Delhi",
-        city: "New Delhi",
-        postalCode: "110063",
-        firstName: "Bharti Airtel",
-        lastName: "Ltd.",
-        phoneNumber: "9818156333",
-        alternateEmail: "paras@unifytech.com",
-        username: "testparas",
+        region: "",
+        city: "",
+        postalCode: "",
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        alternateEmail: "",
+        username: "",
         password: "",
         confirmPassword: "",
-        customerPartyAccountName: "Paras Anand",
-        customerPartyAccountID: "12123123"
+        customerPartyAccountName: "",
+        customerPartyAccountID: ""
       },
       userDetails: [
         {
-          billableID: "paras@unify.com",
-          billablePhoneNumber: "09818156333",
-          planID: "paras@unify.com",
-          cirlce: "paras@unify.com",
-          billablefirstName: "paras@unify.com",
-          billableLastName: "paras@unify.com",
-          billableEmailID: "paras@unify.com"
+          billableID: "",
+          billablePhoneNumber: "",
+          planID: "",
+          cirlce: "",
+          billablefirstName: "",
+          billableLastName: "",
+          billableEmailID: ""
         }
       ],
       isFormSubmitting: false,
       isVerifying: false,
       hasVerified: false
     };
-    this.isAnyFieldEmpty = false;
-    this.handleSubmit = this.handleSubmit.bind(this);
-
-    // this.state = {
-    //   companyInfo: {
-    //     domain: "",
-    //     organizationName: "",
-    //     contactName: "",
-    //     addressLine1: "",
-    //     addressLine2: "",
-    //     country: "IN",
-    //     region: "",
-    //     city: "",
-    //     postalCode: "",
-    //     firstName: "",
-    //     lastName: "",
-    //     phoneNumber: "",
-    //     alternateEmail: "",
-    //     username: "",
-    //     password: "",
-    //     customerPartyAccountName: "",
-    //     customerPartyAccountID: ""
-    //   },
-    //   userDetails: [
-    //     {
-    //       billableID: "",
-    //       billablePhoneNumber: "",
-    //       planID: "",
-    //       cirlce: "",
-    //       billablefirstName: "",
-    //       billableLastName: "",
-    //       billableEmailID: ""
-    //     }
-    //   ]
-    // };
   }
 
   process = (key, value) => {
     if (value == "") {
       this.isAnyFieldEmpty = true;
-      alert(key + "field is empty.");
-      console.log(key + " : " + value + "is blank");
+      // alert(key + "field is empty.");
+      // console.log(key + " : " + value + "is blank");
     }
   };
 
@@ -101,7 +107,7 @@ export default class UserForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
+    // console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
     this.isAnyFieldEmpty = false;
     this.traverse(
       { ...this.state.companyInfo, ...this.state.userDetails },
@@ -111,18 +117,22 @@ export default class UserForm extends Component {
     const { password, confirmPassword } = this.state.companyInfo;
 
     if (password !== confirmPassword) {
+      this.isAnyFieldEmpty = true;
       alert("Passwords don't match.");
-    }
-    if (!this.state.hasVerified) {
+    } else if (!this.state.hasVerified) {
+      this.isAnyFieldEmpty = true;
       alert("Domain not verified.");
     }
-    console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
+    // console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
 
     if (!this.isAnyFieldEmpty && this.state.hasVerified) {
       this.setState({ isFormSubmitting: true });
-      const newState = JSON.parse(JSON.stringify(this.state))
+      const newState = JSON.parse(JSON.stringify(this.state));
       const { companyInfo } = newState;
+
       delete companyInfo.confirmPassword;
+      companyInfo.password = SHA1(companyInfo.password).toString();
+
       axios
         .post(`http://demo0073795.mockable.io/formData`, {
           ...newState.companyInfo,
@@ -139,7 +149,7 @@ export default class UserForm extends Component {
           this.setState({ isFormSubmitting: false });
         });
     } else {
-      // alert("Data is not valid. Please check the entered data.");
+      alert("Error. Please check the data.");
     }
   };
 
@@ -291,8 +301,9 @@ export default class UserForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    // console.clear();
+    console.clear();
     console.log(JSON.stringify(state, null, 2));
+    return null;
   }
 
   render() {
@@ -323,7 +334,7 @@ export default class UserForm extends Component {
               <label>Customer party account name</label>
               <input
                 type="text"
-                id="domain"
+                id="customerPartyAccountName"
                 name="customerPartyAccountName"
                 placeholder="Enter your customer party account name"
                 value={companyInfo.customerPartyAccountName}
@@ -472,7 +483,7 @@ export default class UserForm extends Component {
                   <input
                     type="tel"
                     className="halfWidth"
-                    id="lname"
+                    id="phoneNumber"
                     name="phoneNumber"
                     placeholder="Enter Phone Number"
                     value={companyInfo.phoneNumber}

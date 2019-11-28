@@ -47,6 +47,7 @@ input[type="number"],
 input[type="password"] {
   padding: 6px 6px;
   border: 1px solid #ddd;
+  border-radius: 0px;
   -webkit-appearance: none;
   -webkit-border-radius: 0px;
   box-sizing: border-box;
@@ -128,7 +129,7 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 120px !important;
 }
 .phone-number {
-  width: 200px !important;
+  width: 150px !important;
 }
 .plan-id {
   width: 120px !important;
@@ -143,7 +144,7 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 120px !important;
 }
 .email-id {
-  width: 120px !important;
+  width: 150px !important;
 }
 .customer input,
 .customer span {
