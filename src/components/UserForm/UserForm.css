@@ -107,7 +107,7 @@ select {
   margin: 6px auto;
 }
 .domain-name {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .oneThirdWidth {
@@ -160,16 +160,26 @@ input[type="number"]::-webkit-outer-spin-button {
   margin-top: 10px;
   margin-right: 5px;
   padding: 6px 28px;
-  background-color: blue;
+  border-radius: 3px;
+  box-shadow: 1px 1px 15px hsla(0, 4%, 65%, 0.55);
+  /* background-color: blue; */
+  background: #e40000;
   color: #fff;
   outline: none;
   border: none;
 }
+.addNew:hover,
+.submitBtn:hover,
+.addButton:hover {
+  background: #b30000;
+}
 .submitBtn {
-  background-color: #d40324;
+  background-color: #e40000;
   color: white;
   padding: 7px 27px;
   border: none;
+  border-radius: 3px;
+  box-shadow: 1px 1px 15px hsla(0, 4%, 65%, 0.55);
   cursor: pointer;
   font-size: 12px;
   display: table !important;
@@ -177,12 +187,17 @@ input[type="number"]::-webkit-outer-spin-button {
   margin-top: 30px !important;
 }
 .addButton {
-  background-color: #d40324;
+  background-color: #e40000;
   color: white;
-  padding: 6px 27px;
+  padding: 5px 28px;
+  border-radius: 3px;
+  box-shadow: 1px 1px 15px hsla(0, 4%, 65%, 0.55);
   border: none;
   cursor: pointer;
   font-size: 12px;
   margin-left: 5px;
   outline: none;
+}
+.customer input:first-child {
+  margin-left: 0;
 }

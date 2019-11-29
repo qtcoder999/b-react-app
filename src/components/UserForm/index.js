@@ -2,7 +2,10 @@ import React, { Component } from "react";
 import "./UserForm.css";
 // API
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+  faMinusCircle
+} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import SHA1 from "crypto-js/sha1";
 
@@ -205,7 +208,7 @@ export default class UserForm extends Component {
   };
 
   handleAdd = event => {
-    event.preventDefault();
+    event !== undefined ? event.preventDefault() : null;
 
     const newUserDetails = {
       billableID: "",
@@ -224,12 +227,18 @@ export default class UserForm extends Component {
     });
   };
 
-  handleRemove = event => {
-    event.preventDefault();
+  handleRemove = (index, event) => {
+    event !== undefined ? event.preventDefault() : null;
+
+    console.log("Log index", index);
 
     let userDetails = [...this.state.userDetails]; // make a separate copy of the array
-    userDetails.splice(-1, 1);
-    this.setState({ userDetails });
+    userDetails.splice(index, 1);
+    this.setState({ userDetails }, () => {
+      if (userDetails.length === 0) {
+        this.handleAdd();
+      }
+    });
   };
 
   renderDynamicFormFields() {
@@ -295,14 +304,19 @@ export default class UserForm extends Component {
           type="text"
           required
         />
+        <FontAwesomeIcon
+          icon={faMinusCircle}
+          onClick={this.handleRemove.bind(this, index)}
+          color="#e40000"
+        />
         <br />
       </div>
     ));
   }
 
   static getDerivedStateFromProps(props, state) {
-    console.clear();
-    console.log(JSON.stringify(state, null, 2));
+    // console.clear();
+    // console.log(JSON.stringify(state, null, 2));
     return null;
   }
 
@@ -383,7 +397,7 @@ export default class UserForm extends Component {
                   </button> */}
                 </React.Fragment>
               ) : (
-                <FontAwesomeIcon icon={faCheckCircle} />
+                <FontAwesomeIcon icon={faCheckCircle} color="#e40000" />
               )}
 
               <br />
@@ -481,7 +495,7 @@ export default class UserForm extends Component {
                     required
                   />
                   <input
-                    type="tel"
+                    type="number"
                     className="halfWidth"
                     id="phoneNumber"
                     name="phoneNumber"
@@ -526,7 +540,10 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
                 required
               />
-              <span className="domain-name"> @{companyInfo.domain} </span>
+              <span className="domain-name">
+                {" "}
+                {companyInfo.domain ? " @" + companyInfo.domain : null}
+              </span>
               <br />
               <label>Admin Password</label>
               <input
@@ -580,7 +597,7 @@ export default class UserForm extends Component {
             <button type="button" className="addNew" onClick={this.handleAdd}>
               Add New
             </button>
-            <button
+            {/* <button
               type="button"
               className="addNew"
               onClick={
@@ -588,7 +605,7 @@ export default class UserForm extends Component {
               }
             >
               Remove
-            </button>
+            </button> */}
             <br />
             <input
               className="submitBtn"
