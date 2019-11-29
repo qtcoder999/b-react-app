@@ -32,6 +32,7 @@ export default class UserForm extends Component {
     //     username: "testparas",
     //     password: "",
     //     confirmPassword: "",
+    //     numberOfSeats: "",
     //     customerPartyAccountName: "Paras Anand",
     //     customerPartyAccountID: "12123123"
     //   },
@@ -53,7 +54,11 @@ export default class UserForm extends Component {
     this.isAnyFieldEmpty = false;
     this.handleSubmit = this.handleSubmit.bind(this);
 
-    this.state = {
+    this.state = this.initialState;
+  }
+
+  get initialState() {
+    return {
       companyInfo: {
         domain: "",
         organizationName: "",
@@ -71,6 +76,7 @@ export default class UserForm extends Component {
         username: "",
         password: "",
         confirmPassword: "",
+        numberOfSeats: "",
         customerPartyAccountName: "",
         customerPartyAccountID: ""
       },
@@ -89,6 +95,12 @@ export default class UserForm extends Component {
       isVerifying: false,
       hasVerified: false
     };
+  }
+
+  componentDidMount() {
+    let newState = JSON.parse(window.sessionStorage.getItem("state"));
+    newState.hasVerified = false;
+    this.setState(newState);
   }
 
   process = (key, value) => {
@@ -110,7 +122,6 @@ export default class UserForm extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    // console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
     this.isAnyFieldEmpty = false;
     this.traverse(
       { ...this.state.companyInfo, ...this.state.userDetails },
@@ -125,8 +136,9 @@ export default class UserForm extends Component {
     } else if (!this.state.hasVerified) {
       this.isAnyFieldEmpty = true;
       alert("Domain not verified.");
+    } else if (this.isAnyFieldEmpty) {
+      alert("Error. Please check the data.");
     }
-    // console.log("this.isAnyFieldEmpty", this.isAnyFieldEmpty);
 
     if (!this.isAnyFieldEmpty && this.state.hasVerified) {
       this.setState({ isFormSubmitting: true });
@@ -151,8 +163,6 @@ export default class UserForm extends Component {
         .finally(() => {
           this.setState({ isFormSubmitting: false });
         });
-    } else {
-      alert("Error. Please check the data.");
     }
   };
 
@@ -241,6 +251,10 @@ export default class UserForm extends Component {
     });
   };
 
+  handleClearAllFields = () => {
+    this.setState(this.initialState);
+  };
+
   renderDynamicFormFields() {
     // debugger;
     const { userDetails } = this.state;
@@ -315,11 +329,16 @@ export default class UserForm extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    // console.clear();
-    // console.log(JSON.stringify(state, null, 2));
+    console.clear();
+    console.log(JSON.stringify(state, null, 2));
     return null;
   }
-
+  componentDidUpdate() {
+    let newState = { ...this.state };
+    delete newState.companyInfo.password;
+    delete newState.companyInfo.confirmPassword;
+    window.sessionStorage.setItem("state", JSON.stringify(newState));
+  }
   render() {
     const { companyInfo, hasVerified, isVerifying } = this.state;
     return (
@@ -345,7 +364,7 @@ export default class UserForm extends Component {
         <div className="container">
           <div className="sub-container">
             <form>
-              <label>Customer party account name</label>
+              <label>Customer Party Account Name</label>
               <input
                 type="text"
                 id="customerPartyAccountName"
@@ -355,8 +374,16 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
                 required
               />
+              <button
+                type="button"
+                className="addButton"
+                onClick={this.handleClearAllFields}
+                value="Clear all fields"
+              >
+                Clear all fields
+              </button>
               <br />
-              <label>Customer party account ID</label>
+              <label>Customer Party Account ID</label>
               <input
                 type="text"
                 id="customerPartyAccountID"
@@ -368,16 +395,31 @@ export default class UserForm extends Component {
               />
               <br />
               <label>Domain</label>
-              <input
-                className="halfWidth"
-                type="text"
-                id="domain"
-                name="domain"
-                placeholder="Enter your organisation’s domain"
-                value={companyInfo.domain}
-                onChange={this.handleChange}
-                required
-              />
+              {this.state.hasVerified ? (
+                <input
+                  className="halfWidth"
+                  type="text"
+                  id="domain"
+                  name="domain"
+                  placeholder="Enter your organisation’s domain"
+                  value={companyInfo.domain}
+                  onChange={this.handleChange}
+                  required
+                  readOnly
+                />
+              ) : (
+                <input
+                  className="halfWidth"
+                  type="text"
+                  id="domain"
+                  name="domain"
+                  placeholder="Enter your organisation’s domain"
+                  value={companyInfo.domain}
+                  onChange={this.handleChange}
+                  required
+                />
+              )}
+
               {!hasVerified ? (
                 <React.Fragment>
                   <button
@@ -388,18 +430,20 @@ export default class UserForm extends Component {
                   >
                     Check
                   </button>
-                  {/* <button
-                    type="button"
-                    onClick={isVerifying ? null : this.handleCheckDomain}
-                    value="Add"
-                  >
-                    Cancel
-                  </button> */}
                 </React.Fragment>
               ) : (
-                <FontAwesomeIcon icon={faCheckCircle} color="#e40000" />
+                <React.Fragment>
+                  <FontAwesomeIcon icon={faCheckCircle} color="#e40000" />{" "}
+                  <button
+                    type="button"
+                    className="addButton"
+                    onClick={() => this.setState({ hasVerified: false })}
+                    value="Cancel"
+                  >
+                    Cancel
+                  </button>
+                </React.Fragment>
               )}
-
               <br />
               <label>Organization Name</label>
               <input
@@ -541,8 +585,9 @@ export default class UserForm extends Component {
                 required
               />
               <span className="domain-name">
-                {" "}
-                {companyInfo.domain ? " @" + companyInfo.domain : null}
+                {hasVerified && companyInfo.domain
+                  ? " @" + companyInfo.domain
+                  : null}
               </span>
               <br />
               <label>Admin Password</label>
@@ -563,6 +608,17 @@ export default class UserForm extends Component {
                 id="confirmPassword"
                 name="confirmPassword"
                 value={companyInfo.confirmPassword}
+                onChange={this.handleChange}
+                required
+              />
+              <br />
+              <label>Number Of Seats</label>
+              <input
+                type="number"
+                className="halfWidth"
+                id="numberOfSeats"
+                name="numberOfSeats"
+                value={companyInfo.numberOfSeats}
                 onChange={this.handleChange}
                 required
               />

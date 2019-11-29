@@ -75,6 +75,7 @@ form label {
   vertical-align: top;
   margin-top: 10px;
   margin-right: 10px;
+  font-weight: bold;
 }
 .sub-container {
   display: table;
