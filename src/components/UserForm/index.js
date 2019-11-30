@@ -104,7 +104,7 @@ export default class UserForm extends Component {
   }
 
   process = (key, value) => {
-    if (value == "") {
+    if (value == "" || value == undefined) {
       this.isAnyFieldEmpty = true;
       // alert(key + "field is empty.");
       // console.log(key + " : " + value + "is blank");
@@ -252,7 +252,11 @@ export default class UserForm extends Component {
   };
 
   handleClearAllFields = () => {
-    this.setState(this.initialState);
+    if (window.confirm("Are you sure ?")) {
+      this.setState(this.initialState);
+    } else {
+      // Do nothing!
+    }
   };
 
   renderDynamicFormFields() {
@@ -374,14 +378,7 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
                 required
               />
-              <button
-                type="button"
-                className="addButton"
-                onClick={this.handleClearAllFields}
-                value="Clear all fields"
-              >
-                Clear all fields
-              </button>
+
               <br />
               <label>Customer Party Account ID</label>
               <input
@@ -394,10 +391,10 @@ export default class UserForm extends Component {
                 required
               />
               <br />
-              <label>Domain</label>
+              <label>Customer Domain</label>
               {this.state.hasVerified ? (
                 <input
-                  className="halfWidth"
+                  className="halfWidth inputDisabled"
                   type="text"
                   id="domain"
                   name="domain"
@@ -433,7 +430,7 @@ export default class UserForm extends Component {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  <FontAwesomeIcon icon={faCheckCircle} color="#e40000" />{" "}
+                  <FontAwesomeIcon icon={faCheckCircle} color="green" />{" "}
                   <button
                     type="button"
                     className="addButton"
@@ -519,7 +516,7 @@ export default class UserForm extends Component {
                     required
                   />
                   <input
-                    className="oneThirdWidth"
+                    className="oneThirdWidth mr0"
                     type="text"
                     id="city"
                     name="city"
@@ -663,12 +660,24 @@ export default class UserForm extends Component {
               Remove
             </button> */}
             <br />
-            <input
-              className="submitBtn"
-              type="submit"
-              defaultValue="Submit"
-              onClick={!this.state.isFormSubmitting ? this.handleSubmit : null}
-            />
+            <span class="actionButtons">
+              <input
+                className="submitBtn"
+                type="submit"
+                defaultValue="Submit"
+                onClick={
+                  !this.state.isFormSubmitting ? this.handleSubmit : null
+                }
+              />
+              <button
+                type="button"
+                className="submitBtn"
+                onClick={this.handleClearAllFields}
+                value="Clear all fields"
+              >
+                Clear all fields
+              </button>
+            </span>
             <br />
             {/* {this.state.isFormSubmitting ? (
               <Loader type="Puff" color="#00BFFF" height={50} width={50} />
