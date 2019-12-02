@@ -14,43 +14,6 @@ import SHA1 from "crypto-js/sha1";
 export default class UserForm extends Component {
   constructor(props) {
     super(props);
-    // this.state = {
-    //   companyInfo: {
-    //     domain: "parasTesting.com",
-    //     organizationName: "Airtel Enterprises",
-    //     contactName: "Bharti Airtel Pvt. Ltd.",
-    //     addressLine1: "Plot No. 16",
-    //     addressLine2: "Udyog Vihar",
-    //     country: "IN",
-    //     region: "Delhi",
-    //     city: "New Delhi",
-    //     postalCode: "110063",
-    //     firstName: "Bharti Airtel",
-    //     lastName: "Ltd.",
-    //     phoneNumber: "9818156333",
-    //     alternateEmail: "paras@unifytech.com",
-    //     username: "testparas",
-    //     password: "",
-    //     confirmPassword: "",
-    //     numberOfSeats: "",
-    //     customerPartyAccountName: "Paras Anand",
-    //     customerPartyAccountID: "12123123"
-    //   },
-    //   userDetails: [
-    //     {
-    //       billableID: "paras@unify.com",
-    //       billablePhoneNumber: "09818156333",
-    //       planID: "paras@unify.com",
-    //       cirlce: "paras@unify.com",
-    //       billablefirstName: "paras@unify.com",
-    //       billableLastName: "paras@unify.com",
-    //       billableEmailID: "paras@unify.com"
-    //     }
-    //   ],
-    //   isFormSubmitting: false,
-    //   isVerifying: false,
-    //   hasVerified: false
-    // };
     this.isAnyFieldEmpty = false;
     this.handleSubmit = this.handleSubmit.bind(this);
 
@@ -135,7 +98,7 @@ export default class UserForm extends Component {
       alert("Passwords don't match.");
     } else if (!this.state.hasVerified) {
       this.isAnyFieldEmpty = true;
-      alert("Domain not verified.");
+      alert("Please verify the domain.");
     } else if (this.isAnyFieldEmpty) {
       alert("Error. Please check the data.");
     }
