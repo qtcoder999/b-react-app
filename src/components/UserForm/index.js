@@ -62,7 +62,8 @@ export default class UserForm extends Component {
 
   componentDidMount() {
     let newState = JSON.parse(window.sessionStorage.getItem("state"));
-    newState.hasVerified = false;
+    // debugger;
+    newState["hasVerified"] = false;
     this.setState(newState);
   }
 
@@ -90,6 +91,17 @@ export default class UserForm extends Component {
       { ...this.state.companyInfo, ...this.state.userDetails },
       this.process
     );
+
+    this.setState({
+      companyInfo: JSON.parse(
+        JSON.stringify(this.state.companyInfo).replace(/"\s+|\s+"/g, '"')
+      )
+    });
+    this.setState({
+      userDetails: JSON.parse(
+        JSON.stringify(this.state.userDetails).replace(/"\s+|\s+"/g, '"')
+      )
+    });
 
     const { password, confirmPassword } = this.state.companyInfo;
 
