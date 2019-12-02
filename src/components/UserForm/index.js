@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import SHA1 from "crypto-js/sha1";
-
+import logo from "../../assets/gsuite-2x.png";
 // import Loader from "react-loader-spinner";
 
 export default class UserForm extends Component {
@@ -35,7 +35,7 @@ export default class UserForm extends Component {
         firstName: "",
         lastName: "",
         phoneNumber: "",
-        alternateEmail: "",
+        emailID: "",
         username: "",
         password: "",
         confirmPassword: "",
@@ -83,6 +83,10 @@ export default class UserForm extends Component {
       }
     }
   };
+
+  makeAPIObject(localObject) {
+    let tempObject = JSON.parse(JSON.stringify(localObject));
+  }
 
   handleSubmit = event => {
     event.preventDefault();
@@ -172,14 +176,30 @@ export default class UserForm extends Component {
   handleCheckDomain = event => {
     event.preventDefault();
 
-    const { domain } = this.state;
+    const { domain } = this.state.companyInfo;
+    // console.log("domain ", domain);
     this.setState({ isVerifying: true });
+
+    let headers = {
+      "Content-Type": "application/json;charset=UTF-8",
+      "Access-Control-Allow-Origin": "*"
+    };
+
     axios
-      .post(`http://demo0073795.mockable.io/verificationStatus`, {
-        domain
+      .get(`http://localhost:3000/provisionManager/customer/GSUITE/` + domain, {
+        headers
       })
       .then(response => {
-        this.setState({ hasVerified: true });
+        console.log(response);
+        debugger;
+        if (response.data == "") {
+          // alert("Domain not available.");
+          this.setState({ hasVerified: true });
+        } else {
+          alert("Domain not available.");
+
+          this.setState({ hasVerified: false });
+        }
         // alert("Message from server: " + response.data.verificationStatus);
       })
       .catch(error => {
@@ -307,11 +327,11 @@ export default class UserForm extends Component {
     ));
   }
 
-  static getDerivedStateFromProps(props, state) {
-    console.clear();
-    console.log(JSON.stringify(state, null, 2));
-    return null;
-  }
+  // static getDerivedStateFromProps(props, state) {
+  //   console.clear();
+  //   console.log(JSON.stringify(state, null, 2));
+  //   return null;
+  // }
   componentDidUpdate() {
     let newState = { ...this.state };
     delete newState.companyInfo.password;
@@ -325,10 +345,7 @@ export default class UserForm extends Component {
         <div className="headingContainer">
           <header className="heading-box">
             <span className="logo-box">
-              <img
-                className="logo"
-                src="https://assets.cloud.im/prod/ux1/images/logos/gsuite/gsuite-2x.png"
-              />
+              <img className="logo" src={logo} alt="logo" />
             </span>
             <span className="heading-info-box">
               <h1 className="first-heading">
@@ -423,6 +440,17 @@ export default class UserForm extends Component {
                 id="orgname"
                 name="organizationName"
                 value={companyInfo.organizationName}
+                onChange={this.handleChange}
+                required
+              />
+              <br />
+              <label>Email ID</label>
+              <input
+                type="text"
+                id="lname"
+                name="emailID"
+                value={companyInfo.emailID}
+                placeholder="Enter email address that's not in above entered domain"
                 onChange={this.handleChange}
                 required
               />
@@ -595,17 +623,7 @@ export default class UserForm extends Component {
                 required
               />
               <br />
-              <label>Alternate Email</label>
-              <input
-                type="text"
-                id="lname"
-                name="alternateEmail"
-                value={companyInfo.alternateEmail}
-                placeholder="Enter email address that's not in above entered domain"
-                onChange={this.handleChange}
-                required
-              />
-              <br />
+
               {/* <label>(All fields are mandatory)</label> */}
             </form>
           </div>
