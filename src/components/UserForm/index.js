@@ -63,17 +63,23 @@ export default class UserForm extends Component {
   componentDidMount() {
     let newState = JSON.parse(window.sessionStorage.getItem("state"));
     // debugger;
-    newState
-      ? newState.hasVerified
-        ? (newState.hasVerified = false)
-        : null
-      : null;
+    if (newState && newState.hasVerified) {
+      newState.hasVerified = false;
+    }
+    if (newState && newState.isFormSubmitting) {
+      newState.isFormSubmitting = false;
+    }
+    // newState
+    //   ? newState.hasVerified
+    //     ? (newState.hasVerified = false)
+    //     : null
+    //   : null;
 
-    newState
-      ? newState.isFormSubmitting
-        ? (newState.isFormSubmitting = false)
-        : null
-      : null;
+    // newState
+    //   ? newState.isFormSubmitting
+    //     ? (newState.isFormSubmitting = false)
+    //     : null
+    //   : null;
 
     this.setState(newState);
   }
@@ -215,15 +221,8 @@ export default class UserForm extends Component {
     // console.log("domain ", domain);
     this.setState({ isVerifying: true });
 
-    let headers = {
-      "Content-Type": "application/json;charset=UTF-8",
-      "Access-Control-Allow-Origin": "*"
-    };
-
     axios
-      .get(`http://localhost:3000/provisionManager/customer/GSUITE/` + domain + "", {
-        headers
-      })
+      .get(`/provisionManager/customer/GSUITE/` + domain)
       .then(response => {
         // console.log(response);
         // debugger;
@@ -248,8 +247,9 @@ export default class UserForm extends Component {
   };
 
   handleAdd = event => {
-    event !== undefined ? event.preventDefault() : null;
-
+    if (event !== undefined) {
+      event.preventDefault();
+    }
     const newUserDetails = {
       billableID: "",
       billablePhoneNumber: "",
@@ -268,7 +268,9 @@ export default class UserForm extends Component {
   };
 
   handleRemove = (index, event) => {
-    event !== undefined ? event.preventDefault() : null;
+    if (event !== undefined) {
+      event.preventDefault();
+    }
 
     console.log("Log index", index);
 

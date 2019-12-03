@@ -2,7 +2,6 @@
   "name": "blackforest",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://10.5.245.166:8080",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.25",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
@@ -10,15 +9,30 @@
     "axios": "^0.18.0",
     "crypto-js": "^3.1.9-1",
     "http-proxy-middleware": "^0.20.0",
-    "react": "^16.4.0",
-    "react-dom": "^16.4.0",
-    "react-scripts": "1.1.4",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-scripts": "3.2.0",
     "reactstrap": "^6.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=4555 react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
