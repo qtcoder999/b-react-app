@@ -63,7 +63,18 @@ export default class UserForm extends Component {
   componentDidMount() {
     let newState = JSON.parse(window.sessionStorage.getItem("state"));
     // debugger;
-    newState["hasVerified"] = false;
+    newState
+      ? newState.hasVerified
+        ? (newState.hasVerified = false)
+        : null
+      : null;
+
+    newState
+      ? newState.isFormSubmitting
+        ? (newState.isFormSubmitting = false)
+        : null
+      : null;
+
     this.setState(newState);
   }
 
@@ -83,10 +94,6 @@ export default class UserForm extends Component {
       }
     }
   };
-
-  makeAPIObject(localObject) {
-    let tempObject = JSON.parse(JSON.stringify(localObject));
-  }
 
   handleSubmit = event => {
     event.preventDefault();
@@ -126,7 +133,7 @@ export default class UserForm extends Component {
 
       delete companyInfo.confirmPassword;
       companyInfo.password = SHA1(companyInfo.password).toString();
-
+      // this.makeAPIObject();
       axios
         .post(`http://demo0073795.mockable.io/formData`, {
           ...newState.companyInfo,
@@ -191,12 +198,12 @@ export default class UserForm extends Component {
       })
       .then(response => {
         console.log(response);
-        debugger;
+        // debugger;
         if (response.data == "") {
           // alert("Domain not available.");
           this.setState({ hasVerified: true });
         } else {
-          alert("Domain not available.");
+          alert("Requested domain is not available.");
 
           this.setState({ hasVerified: false });
         }
@@ -386,7 +393,7 @@ export default class UserForm extends Component {
               <label>Customer Domain</label>
               {this.state.hasVerified ? (
                 <input
-                  className="halfWidth inputDisabled"
+                  className="domain halfWidth inputDisabled"
                   type="text"
                   id="domain"
                   name="domain"
@@ -398,7 +405,7 @@ export default class UserForm extends Component {
                 />
               ) : (
                 <input
-                  className="halfWidth"
+                  className="domain halfWidth"
                   type="text"
                   id="domain"
                   name="domain"

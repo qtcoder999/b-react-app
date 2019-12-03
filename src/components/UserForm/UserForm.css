@@ -111,6 +111,10 @@ select {
   font-size: 12px;
 }
 
+.domain {
+  width: 280px !important;
+}
+
 .oneThirdWidth {
   width: 131px !important;
   margin-right: 3px;
