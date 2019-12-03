@@ -95,7 +95,31 @@ export default class UserForm extends Component {
     }
   };
 
+  makeAPIObject(localObject) {
+    let newObject = {
+      firstName: localObject.firstName,
+      lastName: localObject.lastName,
+      phoneNumber: localObject.phoneNumber,
+      customerPartyAccountId: localObject.customerPartyAccountID,
+      customerPartyAccountName: localObject.customerPartyAccountName,
+      organizationName: localObject.organizationName.organizationName,
+      emailId: localObject.emailID,
+      domain: localObject.domain,
+      companyAddress: localObject.contactName,
+      userName: localObject.username,
+      password: localObject.password,
+      addressLine1: localObject.addressLine1,
+      addressLine2: localObject.addressLine2,
+      city: localObject.city,
+      state: localObject.state,
+      country: localObject.country,
+      zipCode: localObject.postalCode
+    };
+    return newObject;
+  }
+
   handleSubmit = event => {
+    let postObject = null;
     event.preventDefault();
     this.isAnyFieldEmpty = false;
     this.traverse(
@@ -133,7 +157,11 @@ export default class UserForm extends Component {
 
       delete companyInfo.confirmPassword;
       companyInfo.password = SHA1(companyInfo.password).toString();
-      // this.makeAPIObject();
+
+      let postObject = this.makeAPIObject(this.state.companyInfo);
+
+      console.log("postObject ", postObject);
+
       axios
         .post(`http://demo0073795.mockable.io/formData`, {
           ...newState.companyInfo,
@@ -193,11 +221,11 @@ export default class UserForm extends Component {
     };
 
     axios
-      .get(`http://localhost:3000/provisionManager/customer/GSUITE/` + domain, {
+      .get(`http://localhost:3000/provisionManager/customer/GSUITE/` + domain + "", {
         headers
       })
       .then(response => {
-        console.log(response);
+        // console.log(response);
         // debugger;
         if (response.data == "") {
           // alert("Domain not available.");
@@ -660,7 +688,7 @@ export default class UserForm extends Component {
               Remove
             </button> */}
             <br />
-            <span class="actionButtons">
+            <span className="actionButtons">
               <input
                 className="submitBtn"
                 type="submit"
