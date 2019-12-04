@@ -92,30 +92,69 @@ export default class UserForm extends Component {
     }
   };
 
-  makeAPIObject(localObject) {
+  makeAPIObject(companyInfo, userDetails) {
+    const _users = userDetails.map(item => {
+      return {
+        firstName: item.billablefirstName,
+        lastName: item.billableLastName,
+        emailId: item.billableEmailID,
+        phoneNumber: item.billablePhoneNumber,
+        circleId: item.cirlce
+      };
+    });
+
     let newObject = {
-      firstName: localObject.firstName,
-      lastName: localObject.lastName,
-      phoneNumber: localObject.phoneNumber,
-      customerPartyAccountId: localObject.customerPartyAccountID,
-      customerPartyAccountName: localObject.customerPartyAccountName,
-      organizationName: localObject.organizationName,
-      emailId: localObject.alternateEmail,
-      address: {
-        addressLine1: localObject.addressLine1,
-        addressLine2: localObject.addressLine2,
-        addressLine3: localObject.addressLine3
+      customerPartyAccountId: companyInfo.customerPartyAccountID,
+      customerPartyAccountName: companyInfo.customerPartyAccountName,
+      organizationName: companyInfo.organizationName,
+      mobileNumber: companyInfo.phoneNumber,
+      emailId: companyInfo.alternateEmail,
+      domain: companyInfo.domain,
+      companyAddress: {
+        addressLine1: companyInfo.addressLine1,
+        addressLine2: companyInfo.addressLine2,
+        // addressLine3: companyInfo.addressLine3
+        city: companyInfo.city,
+        state: companyInfo.region,
+        countryCode: companyInfo.country,
+        zipCode: companyInfo.postalCode
       },
-      domain: localObject.domain,
-      contactName: localObject.contactName,
-      userName: localObject.username,
-      password: localObject.password,
-      city: localObject.city,
-      state: localObject.state,
-      country: localObject.country,
-      zipCode: localObject.postalCode,
-      hashFunction: "SHA-1",
-      numberOfSeats: localObject.numberOfSeats
+      billableAccounts: [
+        {
+          billableId: userDetails[0].billableID,
+          emailId: companyInfo.username + "@" + companyInfo.domain,
+          users: _users
+        }
+      ],
+
+      serviceDetail: {
+        serviceName: "GSUITE",
+        serviceType: "SAAS",
+        numberOfSeats: companyInfo.numberOfSeats,
+        planDetail: {
+          id: "planId1",
+          name: "Free-Guite",
+          priceDetail: {
+            actualPrice: 799,
+            finalPrice: 799,
+            frequency: "yearly"
+          },
+          externalSubscriptionInfo: {
+            skuId: "Google-Apps-For-Business",
+            planName: "FLEXIBLE",
+            renewalType: "RENEW_CURRENT_USERS_MONTHLY_PAY"
+          }
+        }
+      },
+      adminDetail: {
+        firstName: companyInfo.firstName,
+        lastName: companyInfo.lastName,
+        userName: companyInfo.username,
+        password: companyInfo.password,
+        hashFunction: "SHA-1"
+      },
+      action: "CREATE"
+      // contactName: companyInfo.contactName,
     };
     return newObject;
   }
@@ -167,20 +206,50 @@ export default class UserForm extends Component {
 
       companyInfo.password = SHA1(companyInfo.password).toString();
 
-      let postObject = this.makeAPIObject(newState.companyInfo);
+      let postObject = this.makeAPIObject(
+        newState.companyInfo,
+        newState.userDetails
+      );
+
+      // debugger;
 
       console.log(SHA1(companyInfo.password).toString());
       console.log("postObject ", postObject);
 
       axios
-        .post(`http://demo0073795.mockable.io/formData`, {
+        // .post(`http://demo0073795.mockable.io/formData`, {
+        // .post(`/submit`, {
+        .post(`/submit`, {
           ...postObject
         })
         .then(response => {
-          alert("Message from server: " + response.data.message);
+          if (response.status == 200) {
+            let { orderStatusDetail, orderDetail } = response.data;
+            console.log("OrderId: " + orderDetail.orderId);
+            if (orderStatusDetail) {
+              if (
+                orderStatusDetail.orderStatus === "IN_PROGRESS" &&
+                orderStatusDetail.orderEvent === "PROVISION_SUBSCRIPTION"
+              ) {
+                alert("Successfully submitted on server.");
+              }
+            }
+          }
+
           this.setState({ hasVerified: false });
         })
         .catch(error => {
+          if (error) {
+            if (error.response.data.message) {
+              alert(
+                "Message from server: " +
+                  error.response.data.code +
+                  " - " +
+                  error.response.data.message
+              );
+            }
+          }
+
           console.log(error);
           alert("Submission unsuccessful.");
         })
@@ -271,7 +340,7 @@ export default class UserForm extends Component {
       event.preventDefault();
     }
 
-    let userDetails = [...this.state.userDetails]; // make a separate copy of the array
+    let userDetails = [...this.state.userDetails];
     userDetails.splice(index, 1);
     this.setState({ userDetails }, () => {
       if (userDetails.length === 0) {
@@ -418,30 +487,19 @@ export default class UserForm extends Component {
               />
               <br />
               <label>Customer Domain</label>
-              {this.state.hasVerified ? (
-                <input
-                  className="domain halfWidth inputDisabled"
-                  type="text"
-                  id="domain"
-                  name="domain"
-                  placeholder="Enter your organisation’s domain"
-                  value={companyInfo.domain}
-                  onChange={this.handleChange}
-                  required
-                  readOnly
-                />
-              ) : (
-                <input
-                  className="domain halfWidth"
-                  type="text"
-                  id="domain"
-                  name="domain"
-                  placeholder="Enter your organisation’s domain"
-                  value={companyInfo.domain}
-                  onChange={this.handleChange}
-                  required
-                />
-              )}
+              <input
+                className={
+                  "domain halfWidth " +
+                  (this.state.hasVerified ? "inputDisabled" : "")
+                }
+                type="text"
+                id="domain"
+                name="domain"
+                placeholder="Enter your organisation’s domain"
+                value={companyInfo.domain}
+                onChange={this.handleChange}
+                disabled={this.state.hasVerified}
+              />
 
               {!hasVerified ? (
                 <React.Fragment>
@@ -642,7 +700,6 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
               />
               <br />
-
               {/* <label>(All fields are mandatory)</label> */}
             </form>
           </div>

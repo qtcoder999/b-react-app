@@ -9,5 +9,12 @@ module.exports = function(app) {
       logLevel: "debug"
     })
   );
-
+  app.use(
+    proxy("/submit", {
+      target: "http://10.12.68.202:8080/",
+      changeOrigin: true,
+      secure: false,
+      logLevel: "debug"
+    })
+  );
 };
