@@ -61,7 +61,6 @@ export default class UserForm extends Component {
   }
 
   componentDidMount() {
-    console.log("componentDidMount");
     let newState = JSON.parse(window.sessionStorage.getItem("state"));
 
     if (newState && newState.hasVerified) {
@@ -223,23 +222,18 @@ export default class UserForm extends Component {
     event.preventDefault();
 
     const { domain } = this.state.companyInfo;
-    // console.log("domain ", domain);
     this.setState({ isVerifying: true });
 
     axios
       .get(`/provisionManager/customer/GSUITE/` + domain)
       .then(response => {
-        // console.log(response);
-
         if (response.data == "") {
-          // alert("Domain not available.");
           this.setState({ hasVerified: true });
         } else {
           alert("Requested domain is not available.");
 
           this.setState({ hasVerified: false });
         }
-        // alert("Message from server: " + response.data.verificationStatus);
       })
       .catch(error => {
         this.setState({ hasVerified: false });
@@ -411,7 +405,6 @@ export default class UserForm extends Component {
                 placeholder="Enter your customer party account name"
                 value={companyInfo.customerPartyAccountName}
                 onChange={this.handleChange}
-                required
               />
               <br />
               <label>Customer Party Account ID</label>
@@ -422,7 +415,6 @@ export default class UserForm extends Component {
                 placeholder="Enter your customer party account ID"
                 value={companyInfo.customerPartyAccountID}
                 onChange={this.handleChange}
-                required
               />
               <br />
               <label>Customer Domain</label>
@@ -483,7 +475,6 @@ export default class UserForm extends Component {
                 name="organizationName"
                 value={companyInfo.organizationName}
                 onChange={this.handleChange}
-                required
               />
               <br />
               <label>Email ID</label>
@@ -494,7 +485,6 @@ export default class UserForm extends Component {
                 value={companyInfo.alternateEmail}
                 placeholder="Enter email address that's not in above entered domain"
                 onChange={this.handleChange}
-                required
               />
               <br />
               <div className="separatingMargin">
@@ -507,7 +497,6 @@ export default class UserForm extends Component {
                     placeholder="Contact Name"
                     value={companyInfo.contactName}
                     onChange={this.handleChange}
-                    required
                   />
                   <br />
                   <input
@@ -517,7 +506,6 @@ export default class UserForm extends Component {
                     placeholder="Street Address Line 1"
                     value={companyInfo.addressLine1}
                     onChange={this.handleChange}
-                    required
                   />
                   <br />
                   <input
@@ -527,7 +515,6 @@ export default class UserForm extends Component {
                     placeholder="Street Address Line 2"
                     value={companyInfo.addressLine2}
                     onChange={this.handleChange}
-                    required
                   />
                   <input
                     type="text"
@@ -544,7 +531,6 @@ export default class UserForm extends Component {
                     name="country"
                     onChange={this.handleChange}
                     value={companyInfo.country}
-                    required
                   >
                     <option value="IN">India</option>
                     <option value="AUS">Australia</option>
@@ -559,7 +545,6 @@ export default class UserForm extends Component {
                     placeholder="Enter State"
                     value={companyInfo.region}
                     onChange={this.handleChange}
-                    required
                   />
                   <input
                     className="oneThirdWidth mr0"
@@ -569,7 +554,6 @@ export default class UserForm extends Component {
                     placeholder="Enter City"
                     value={companyInfo.city}
                     onChange={this.handleChange}
-                    required
                   />
                   <input
                     type="number"
@@ -579,7 +563,6 @@ export default class UserForm extends Component {
                     placeholder="Enter Pin Code"
                     value={companyInfo.postalCode}
                     onChange={this.handleChange}
-                    required
                   />
                   <input
                     type="number"
@@ -589,7 +572,6 @@ export default class UserForm extends Component {
                     placeholder="Enter Phone Number"
                     value={companyInfo.phoneNumber}
                     onChange={this.handleChange}
-                    required
                   />
                   <br />
                 </span>
@@ -604,7 +586,6 @@ export default class UserForm extends Component {
                 placeholder="First Name"
                 value={companyInfo.firstName}
                 onChange={this.handleChange}
-                required
               />
               <input
                 className="halfWidth"
@@ -614,7 +595,6 @@ export default class UserForm extends Component {
                 placeholder="Last Name"
                 value={companyInfo.lastName}
                 onChange={this.handleChange}
-                required
               />
               <br />
               <label>Admin Username</label>
@@ -625,7 +605,6 @@ export default class UserForm extends Component {
                 name="username"
                 value={companyInfo.username}
                 onChange={this.handleChange}
-                required
               />
               <span className="domain-name">
                 {hasVerified && companyInfo.domain
@@ -641,7 +620,6 @@ export default class UserForm extends Component {
                 name="password"
                 value={companyInfo.password}
                 onChange={this.handleChange}
-                required
               />
               <br />
               <label>Admin Confirm Password</label>
@@ -652,7 +630,6 @@ export default class UserForm extends Component {
                 name="confirmPassword"
                 value={companyInfo.confirmPassword}
                 onChange={this.handleChange}
-                required
               />
               <br />
               <label>Number Of Seats</label>
@@ -663,7 +640,6 @@ export default class UserForm extends Component {
                 name="numberOfSeats"
                 value={companyInfo.numberOfSeats}
                 onChange={this.handleChange}
-                required
               />
               <br />
 
