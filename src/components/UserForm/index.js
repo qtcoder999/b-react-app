@@ -1,6 +1,6 @@
+/* eslint-disable eqeqeq */
 import React, { Component } from "react";
 import "./UserForm.css";
-// API
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
@@ -9,7 +9,6 @@ import {
 import axios from "axios";
 import SHA1 from "crypto-js/sha1";
 import logo from "../../assets/gsuite-2x.png";
-// import Loader from "react-loader-spinner";
 
 export default class UserForm extends Component {
   constructor(props) {
@@ -28,6 +27,7 @@ export default class UserForm extends Component {
         contactName: "",
         addressLine1: "",
         addressLine2: "",
+        addressLine3: "",
         country: "IN",
         region: "",
         city: "",
@@ -35,7 +35,7 @@ export default class UserForm extends Component {
         firstName: "",
         lastName: "",
         phoneNumber: "",
-        emailID: "",
+        alternateEmail: "",
         username: "",
         password: "",
         confirmPassword: "",
@@ -61,25 +61,17 @@ export default class UserForm extends Component {
   }
 
   componentDidMount() {
+    console.log("componentDidMount");
     let newState = JSON.parse(window.sessionStorage.getItem("state"));
-    // debugger;
+
     if (newState && newState.hasVerified) {
       newState.hasVerified = false;
     }
     if (newState && newState.isFormSubmitting) {
       newState.isFormSubmitting = false;
     }
-    // newState
-    //   ? newState.hasVerified
-    //     ? (newState.hasVerified = false)
-    //     : null
-    //   : null;
-
-    // newState
-    //   ? newState.isFormSubmitting
-    //     ? (newState.isFormSubmitting = false)
-    //     : null
-    //   : null;
+    // newState.companyInfo.password = "";
+    // newState.companyInfo.confirmPassword = "";
 
     this.setState(newState);
   }
@@ -108,23 +100,29 @@ export default class UserForm extends Component {
       phoneNumber: localObject.phoneNumber,
       customerPartyAccountId: localObject.customerPartyAccountID,
       customerPartyAccountName: localObject.customerPartyAccountName,
-      organizationName: localObject.organizationName.organizationName,
-      emailId: localObject.emailID,
+      organizationName: localObject.organizationName,
+      emailId: localObject.alternateEmail,
+      address: {
+        addressLine1: localObject.addressLine1,
+        addressLine2: localObject.addressLine2,
+        addressLine3: localObject.addressLine3
+      },
       domain: localObject.domain,
-      companyAddress: localObject.contactName,
+      contactName: localObject.contactName,
       userName: localObject.username,
       password: localObject.password,
-      addressLine1: localObject.addressLine1,
-      addressLine2: localObject.addressLine2,
       city: localObject.city,
       state: localObject.state,
       country: localObject.country,
-      zipCode: localObject.postalCode
+      zipCode: localObject.postalCode,
+      hashFunction: "SHA-1",
+      numberOfSeats: localObject.numberOfSeats
     };
     return newObject;
   }
 
   handleSubmit = event => {
+    // eslint-disable-next-line no-unused-vars
     let postObject = null;
     event.preventDefault();
     this.isAnyFieldEmpty = false;
@@ -154,27 +152,34 @@ export default class UserForm extends Component {
       alert("Please verify the domain.");
     } else if (this.isAnyFieldEmpty) {
       alert("Error. Please check the data.");
+    } else if (password.length <= 8) {
+      alert("Password should be of at least 8 characters.");
+      this.isAnyFieldEmpty = true;
     }
 
     if (!this.isAnyFieldEmpty && this.state.hasVerified) {
       this.setState({ isFormSubmitting: true });
+
+      // make newState to delete confirm password key
       const newState = JSON.parse(JSON.stringify(this.state));
       const { companyInfo } = newState;
 
       delete companyInfo.confirmPassword;
+
       companyInfo.password = SHA1(companyInfo.password).toString();
 
-      let postObject = this.makeAPIObject(this.state.companyInfo);
+      let postObject = this.makeAPIObject(newState.companyInfo);
 
+      console.log(SHA1(companyInfo.password).toString());
       console.log("postObject ", postObject);
 
       axios
         .post(`http://demo0073795.mockable.io/formData`, {
-          ...newState.companyInfo,
-          ...newState.userDetails
+          ...postObject
         })
         .then(response => {
           alert("Message from server: " + response.data.message);
+          this.setState({ hasVerified: false });
         })
         .catch(error => {
           console.log(error);
@@ -225,7 +230,7 @@ export default class UserForm extends Component {
       .get(`/provisionManager/customer/GSUITE/` + domain)
       .then(response => {
         // console.log(response);
-        // debugger;
+
         if (response.data == "") {
           // alert("Domain not available.");
           this.setState({ hasVerified: true });
@@ -272,8 +277,6 @@ export default class UserForm extends Component {
       event.preventDefault();
     }
 
-    console.log("Log index", index);
-
     let userDetails = [...this.state.userDetails]; // make a separate copy of the array
     userDetails.splice(index, 1);
     this.setState({ userDetails }, () => {
@@ -292,7 +295,6 @@ export default class UserForm extends Component {
   };
 
   renderDynamicFormFields() {
-    // debugger;
     const { userDetails } = this.state;
     return this.state.userDetails.map((item, index) => (
       <div className="customer" key={index}>
@@ -369,10 +371,14 @@ export default class UserForm extends Component {
   //   console.log(JSON.stringify(state, null, 2));
   //   return null;
   // }
+
   componentDidUpdate() {
-    let newState = { ...this.state };
-    delete newState.companyInfo.password;
-    delete newState.companyInfo.confirmPassword;
+    let newState = JSON.parse(JSON.stringify({ ...this.state }));
+
+    // stop password to go into the sessionStorage due to security reasons
+    newState.companyInfo.password = "";
+    newState.companyInfo.confirmPassword = "";
+
     window.sessionStorage.setItem("state", JSON.stringify(newState));
   }
   render() {
@@ -407,7 +413,6 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
                 required
               />
-
               <br />
               <label>Customer Party Account ID</label>
               <input
@@ -485,8 +490,8 @@ export default class UserForm extends Component {
               <input
                 type="text"
                 id="lname"
-                name="emailID"
-                value={companyInfo.emailID}
+                name="alternateEmail"
+                value={companyInfo.alternateEmail}
                 placeholder="Enter email address that's not in above entered domain"
                 onChange={this.handleChange}
                 required
@@ -524,13 +529,14 @@ export default class UserForm extends Component {
                     onChange={this.handleChange}
                     required
                   />
-                  {/* <input
+                  <input
                     type="text"
                     id="addressLine3"
                     name="addressLine3"
                     placeholder="Street Address Line 3"
+                    value={companyInfo.addressLine3}
                     onChange={this.handleChange}
-                  /> */}
+                  />
                   <br />
                   <select
                     className="oneThirdWidth"
