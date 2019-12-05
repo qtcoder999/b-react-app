@@ -1,16 +1,20 @@
 /* eslint-disable eqeqeq */
 import React, { Component } from "react";
-import "./UserForm.css";
+import { withRouter } from "react-router-dom";
+import axios from "axios";
+import SHA1 from "crypto-js/sha1";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
   faMinusCircle
 } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
-import SHA1 from "crypto-js/sha1";
+
+// Styles
+import "./UserForm.css";
+
 import logo from "../../assets/gsuite-2x.png";
 
-export default class UserForm extends Component {
+class UserForm extends Component {
   constructor(props) {
     super(props);
     this.isAnyFieldEmpty = false;
@@ -429,6 +433,12 @@ export default class UserForm extends Component {
     ));
   }
 
+  handleOrderStatusClick = () => {
+    const {
+      history: { push }
+    } = this.props;
+    push("/orderStatus");
+  };
   // static getDerivedStateFromProps(props, state) {
   //   console.clear();
   //   console.log(JSON.stringify(state, null, 2));
@@ -741,6 +751,14 @@ export default class UserForm extends Component {
               <button
                 type="button"
                 className="submitBtn"
+                onClick={this.handleOrderStatusClick}
+                value="View Order Status"
+              >
+                View Order Status
+              </button>
+              <button
+                type="button"
+                className="submitBtn"
                 onClick={this.handleClearAllFields}
                 value="Clear all fields"
               >
@@ -757,3 +775,5 @@ export default class UserForm extends Component {
     );
   }
 }
+
+export default withRouter(UserForm);

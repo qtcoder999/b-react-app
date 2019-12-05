@@ -187,6 +187,7 @@ input[type="number"]::-webkit-outer-spin-button {
   box-shadow: 1px 1px 15px hsla(0, 4%, 65%, 0.55);
   cursor: pointer;
   font-size: 12px;
+  margin-right: 2px !important;
 }
 .addButton {
   background-color: #e40000;
