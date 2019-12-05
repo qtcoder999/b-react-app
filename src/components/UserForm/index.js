@@ -128,6 +128,7 @@ export default class UserForm extends Component {
       ],
 
       serviceDetail: {
+        productId: "PRD_12254",
         serviceName: "GSUITE",
         serviceType: "SAAS",
         numberOfSeats: companyInfo.numberOfSeats,

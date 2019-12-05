@@ -11,7 +11,7 @@ module.exports = function(app) {
   );
   app.use(
     proxy("/submit", {
-      target: "http://10.12.68.202:8080/",
+      target: "http://10.5.245.166:9090/",
       changeOrigin: true,
       secure: false,
       logLevel: "debug"
