@@ -6,9 +6,9 @@ import {
   faCheckCircle,
   faMinusCircle
 } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
 import SHA1 from "crypto-js/sha1";
 import logo from "../../assets/gsuite-2x.png";
+import { checkIfDomainIsValid, submitOrder } from "../../api/http.service";
 
 export default class UserForm extends Component {
   constructor(props) {
@@ -217,12 +217,7 @@ export default class UserForm extends Component {
       console.log(SHA1(companyInfo.password).toString());
       console.log("postObject ", postObject);
 
-      axios
-        // .post(`http://demo0073795.mockable.io/formData`, {
-        // .post(`/submit`, {
-        .post(`/submit`, {
-          ...postObject
-        })
+      submitOrder({ ...postObject })
         .then(response => {
           if (response.status == 200) {
             let { orderStatusDetail, orderDetail } = response.data;
@@ -294,8 +289,7 @@ export default class UserForm extends Component {
     const { domain } = this.state.companyInfo;
     this.setState({ isVerifying: true });
 
-    axios
-      .get(`/provisionManager/customer/GSUITE/` + domain)
+    checkIfDomainIsValid(domain)
       .then(response => {
         if (response.data == "") {
           this.setState({ hasVerified: true });
@@ -442,6 +436,7 @@ export default class UserForm extends Component {
     // stop password to go into the sessionStorage due to security reasons
     newState.companyInfo.password = "";
     newState.companyInfo.confirmPassword = "";
+    newState.hasVerified = true;
 
     window.sessionStorage.setItem("state", JSON.stringify(newState));
   }
