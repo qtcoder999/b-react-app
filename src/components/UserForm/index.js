@@ -1,10 +1,13 @@
 /* eslint-disable eqeqeq */
 import React, { Component } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./UserForm.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
-  faMinusCircle
+  faMinusCircle,
+  faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import SHA1 from "crypto-js/sha1";
 import logo from "../../assets/gsuite-2x.png";
@@ -15,7 +18,6 @@ export default class UserForm extends Component {
     super(props);
     this.isAnyFieldEmpty = false;
     this.handleSubmit = this.handleSubmit.bind(this);
-
     this.state = this.initialState;
   }
 
@@ -49,14 +51,15 @@ export default class UserForm extends Component {
           billablePhoneNumber: "",
           planID: "",
           cirlce: "",
-          billablefirstName: "",
+          billableFirstName: "",
           billableLastName: "",
           billableEmailID: ""
         }
       ],
       isFormSubmitting: false,
       isVerifying: false,
-      hasVerified: false
+      hasVerified: false,
+      verificationError: false
     };
   }
 
@@ -69,16 +72,54 @@ export default class UserForm extends Component {
     if (newState && newState.isFormSubmitting) {
       newState.isFormSubmitting = false;
     }
+    if (newState && newState.verificationError) {
+      newState.verificationError = false;
+    }
     // newState.companyInfo.password = "";
     // newState.companyInfo.confirmPassword = "";
 
-    this.setState(newState);
+    this.setState(newState, this.populateDomainInRows);
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    let newState = JSON.parse(JSON.stringify({ ...this.state }));
+
+    // stop password to go into the sessionStorage due to security reasons
+    newState.companyInfo.password = "";
+    newState.companyInfo.confirmPassword = "";
+    // newState.hasVerified = true;
+
+    window.sessionStorage.setItem("state", JSON.stringify(newState));
+
+    if (prevState.hasVerified != this.state.hasVerified) {
+      this.populateDomainInRows();
+    }
+  }
+  populateDomainInRows = () => {
+    let {
+      companyInfo: { domain, username },
+      userDetails
+    } = this.state;
+
+    let newUserDetails = JSON.parse(JSON.stringify(userDetails));
+
+    if (this.state.hasVerified) {
+      newUserDetails = newUserDetails.map((item, index) => {
+        return { ...item, billableEmailID: username + "@" + domain };
+      });
+    } else {
+      newUserDetails = newUserDetails.map((item, index) => {
+        return { ...item, billableEmailID: "" };
+      });
+    }
+
+    this.setState({ userDetails: newUserDetails });
+  };
 
   process = (key, value) => {
     if (value == "" || value == undefined) {
       this.isAnyFieldEmpty = true;
-      // alert(key + "field is empty.");
+      // toast.error(key + "field is empty.");
       // console.log(key + " : " + value + "is blank");
     }
   };
@@ -95,7 +136,7 @@ export default class UserForm extends Component {
   makeAPIObject(companyInfo, userDetails) {
     const _users = userDetails.map(item => {
       return {
-        firstName: item.billablefirstName,
+        firstName: item.billableFirstName,
         lastName: item.billableLastName,
         emailId: item.billableEmailID,
         phoneNumber: item.billablePhoneNumber,
@@ -150,7 +191,7 @@ export default class UserForm extends Component {
       adminDetail: {
         firstName: companyInfo.firstName,
         lastName: companyInfo.lastName,
-        userName: companyInfo.username,
+        userName: companyInfo.username + "@" + companyInfo.domain,
         password: companyInfo.password,
         hashFunction: "SHA-1"
       },
@@ -185,14 +226,14 @@ export default class UserForm extends Component {
 
     if (password !== confirmPassword) {
       this.isAnyFieldEmpty = true;
-      alert("Passwords don't match.");
+      toast.error("Passwords don't match.");
     } else if (!this.state.hasVerified) {
       this.isAnyFieldEmpty = true;
-      alert("Please verify the domain.");
+      toast.error("Please verify the domain.");
     } else if (this.isAnyFieldEmpty) {
-      alert("Error. Please check the data.");
+      toast.error("Error. Please check the data.");
     } else if (password.length <= 8) {
-      alert("Password should be of at least 8 characters.");
+      toast.error("Password should be of at least 8 characters.");
       this.isAnyFieldEmpty = true;
     }
 
@@ -212,8 +253,6 @@ export default class UserForm extends Component {
         newState.userDetails
       );
 
-      // debugger;
-
       console.log(SHA1(companyInfo.password).toString());
       console.log("postObject ", postObject);
 
@@ -227,7 +266,7 @@ export default class UserForm extends Component {
                 orderStatusDetail.orderStatus === "IN_PROGRESS" &&
                 orderStatusDetail.orderEvent === "PROVISION_SUBSCRIPTION"
               ) {
-                alert("Successfully submitted on server.");
+                toast.error("Successfully submitted on server.");
               }
             }
           }
@@ -237,7 +276,7 @@ export default class UserForm extends Component {
         .catch(error => {
           if (error) {
             if (error.response.data.message) {
-              alert(
+              toast.error(
                 "Message from server: " +
                   error.response.data.code +
                   " - " +
@@ -247,7 +286,7 @@ export default class UserForm extends Component {
           }
 
           console.log(error);
-          alert("Submission unsuccessful.");
+          toast.error("Submission unsuccessful.");
         })
         .finally(() => {
           this.setState({ isFormSubmitting: false });
@@ -280,12 +319,62 @@ export default class UserForm extends Component {
           [name]: value
         }
       };
-    });
+    }, this.handleExtraChanges.bind(this, name, value));
+  };
+  handleExtraChanges(name, value) {
+    if (name === "numberOfSeats") {
+      this.manageRows();
+    } else if (name === "firstName" || "lastName" || "username") {
+      this.autoPopulateAdminDetails(name, value);
+    }
+  }
+
+  autoPopulateAdminDetails = (name, value) => {
+    let { userDetails } = this.state;
+
+    let userDetailsTemp = JSON.parse(JSON.stringify(userDetails));
+
+    if (name === "firstName") {
+      userDetailsTemp[0].billableFirstName = value;
+    } else if (name === "lastName") {
+      userDetailsTemp[0].billableLastName = value;
+    } else if (name === "username") {
+      if (this.state.hasVerified) {
+        const {
+          companyInfo: { domain }
+        } = this.state;
+        userDetailsTemp[0].billableEmailID = value + "@" + domain;
+      } else {
+        userDetailsTemp[0].billableEmailID = "";
+      }
+    }
+
+    this.setState({ userDetails: userDetailsTemp });
+  };
+
+  manageRows = () => {
+    let {
+      userDetails,
+      companyInfo: { numberOfSeats }
+    } = this.state;
+
+    if (
+      numberOfSeats >= 1 &&
+      this.state.userDetails.length >= this.state.companyInfo.numberOfSeats
+    ) {
+      let userDetailsTemp = JSON.parse(JSON.stringify(userDetails));
+
+      userDetailsTemp.splice(
+        numberOfSeats,
+        userDetailsTemp.length - numberOfSeats
+      );
+
+      this.setState({ userDetails: userDetailsTemp });
+    }
   };
 
   handleCheckDomain = event => {
     event.preventDefault();
-
     const { domain } = this.state.companyInfo;
     this.setState({ isVerifying: true });
 
@@ -294,15 +383,15 @@ export default class UserForm extends Component {
         if (response.data == "") {
           this.setState({ hasVerified: true });
         } else {
-          alert("Requested domain is not available.");
+          toast.error("Requested domain is not available.");
 
-          this.setState({ hasVerified: false });
+          this.setState({ hasVerified: false, verificationError: true });
         }
       })
       .catch(error => {
-        this.setState({ hasVerified: false });
+        this.setState({ hasVerified: false, verificationError: true });
         console.log(error);
-        alert("Verification unsuccessful");
+        toast.error("Verification unsuccessful");
       })
       .finally(() => {
         this.setState({ isVerifying: false });
@@ -313,21 +402,39 @@ export default class UserForm extends Component {
     if (event !== undefined) {
       event.preventDefault();
     }
-    const newUserDetails = {
-      billableID: "",
-      billablePhoneNumber: "",
-      planID: "",
-      cirlce: "",
-      billablefirstName: "",
-      billableLastName: "",
-      billableEmailID: ""
-    };
-    // alert("Call Verification API");
-    this.setState(prevState => {
-      return {
-        userDetails: [...prevState.userDetails, { ...newUserDetails }]
+    const {
+      companyInfo: { numberOfSeats }
+    } = this.state;
+
+    if (this.state.userDetails.length < numberOfSeats) {
+      const {
+        hasVerified,
+        companyInfo: { domain }
+      } = this.state;
+
+      const newUserDetails = {
+        billableID: "",
+        billablePhoneNumber: "",
+        planID: "",
+        cirlce: "",
+        billableFirstName: "",
+        billableLastName: "",
+        billableEmailID: hasVerified && domain ? " @" + domain : null
       };
-    });
+
+      this.setState(prevState => {
+        return {
+          userDetails: [...prevState.userDetails, { ...newUserDetails }]
+        };
+      });
+    } else if (numberOfSeats == "") {
+      toast.error("Please fill the number of seats to add a new row.");
+    } else if (
+      numberOfSeats !== "" &&
+      this.state.userDetails.length == numberOfSeats
+    ) {
+      toast.error("Please increase the number of seats to add a new row.");
+    }
   };
 
   handleRemove = (index, event) => {
@@ -354,6 +461,7 @@ export default class UserForm extends Component {
 
   renderDynamicFormFields() {
     const { userDetails } = this.state;
+
     return this.state.userDetails.map((item, index) => (
       <div className="customer" key={index}>
         <input
@@ -374,14 +482,14 @@ export default class UserForm extends Component {
           type="tel"
           required
         />
-        <input
+        {/* <input
           className="plan-id"
           name="planID"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].planID : ""}
           type="text"
           required
-        />
+        /> */}
         <input
           className="cirlce"
           name="cirlce"
@@ -391,32 +499,35 @@ export default class UserForm extends Component {
           required
         />
         <input
-          className="first-name"
-          name="billablefirstName"
+          className={"first-name " + (index == 0 ? "inputDisabled" : "")}
+          name="billableFirstName"
           onChange={this.handleBillableFormChange.bind(this, index)}
-          value={userDetails[index] ? userDetails[index].billablefirstName : ""}
+          value={userDetails[index] ? userDetails[index].billableFirstName : ""}
           type="text"
           required
+          disabled={index == 0}
         />
         <input
-          className="last-name"
+          className={"last-name " + (index == 0 ? "inputDisabled" : "")}
           name="billableLastName"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].billableLastName : ""}
           type="text"
+          disabled={index == 0}
           required
         />
         <input
-          className="email-id"
+          className={"email-id inputBox " + (index == 0 ? "inputDisabled" : "")}
           name="billableEmailID"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].billableEmailID : ""}
           type="text"
+          disabled={index == 0}
           required
-        />
+        />{" "}
         <FontAwesomeIcon
           icon={faMinusCircle}
-          onClick={this.handleRemove.bind(this, index)}
+          onClick={index !== 0 ? this.handleRemove.bind(this, index) : null}
           color="#e40000"
         />
         <br />
@@ -424,26 +535,19 @@ export default class UserForm extends Component {
     ));
   }
 
-  // static getDerivedStateFromProps(props, state) {
-  //   console.clear();
-  //   console.log(JSON.stringify(state, null, 2));
-  //   return null;
-  // }
-
-  componentDidUpdate() {
-    let newState = JSON.parse(JSON.stringify({ ...this.state }));
-
-    // stop password to go into the sessionStorage due to security reasons
-    newState.companyInfo.password = "";
-    newState.companyInfo.confirmPassword = "";
-    newState.hasVerified = true;
-
-    window.sessionStorage.setItem("state", JSON.stringify(newState));
-  }
   render() {
-    const { companyInfo, hasVerified, isVerifying } = this.state;
+    const {
+      companyInfo,
+      hasVerified,
+      isVerifying,
+      verificationError
+    } = this.state;
     return (
       <div>
+        <ToastContainer
+          className="toast-container"
+          toastClassName="dark-toast"
+        />
         <div className="headingContainer">
           <header className="heading-box">
             <span className="logo-box">
@@ -499,6 +603,11 @@ export default class UserForm extends Component {
 
               {!hasVerified ? (
                 <React.Fragment>
+                  {verificationError ? (
+                    <span className="fontAwesomeIcon">
+                      <FontAwesomeIcon icon={faTimesCircle} color="red" />
+                    </span>
+                  ) : null}
                   <button
                     type="button"
                     className="addButton"
@@ -510,7 +619,9 @@ export default class UserForm extends Component {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  <FontAwesomeIcon icon={faCheckCircle} color="green" />{" "}
+                  <span>
+                    <FontAwesomeIcon icon={faCheckCircle} color="green" />
+                  </span>
                   <button
                     type="button"
                     className="addButton"
@@ -705,8 +816,8 @@ export default class UserForm extends Component {
             <div className="customer-heading">
               <span className="billable-id">Billable ID</span>
               <span className="phone-number">Phone Number</span>
-              <span className="plan-id">Plan ID</span>
-              <span className="cirlce">Circle</span>
+              {/* <span className="plan-id">Plan ID</span> */}
+              <span className="cirlce">Circle ID</span>
               <span className="first-name">First Name</span>
               <span className="last-name">Last Name</span>
               <span className="email-id">Email ID</span>

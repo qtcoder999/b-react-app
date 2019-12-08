@@ -108,7 +108,7 @@ select {
   margin: 6px auto;
 }
 .domain-name {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .domain {
@@ -149,7 +149,7 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 120px !important;
 }
 .email-id {
-  width: 150px !important;
+  width: 250px !important;
 }
 .customer input,
 .customer span {
@@ -213,4 +213,14 @@ input[type="number"]::-webkit-outer-spin-button {
   display: table !important;
   margin: 0 auto !important;
   margin-top: 30px !important;
+}
+.Toastify__toast--error {
+  background-color: #e40000;
+}
+.Toastify__toast--error * {
+  font-size: 14px;
+}
+.fontAwesomeIcon {
+  margin-right: 2px;
+  margin-left: 2px;
 }
