@@ -110,7 +110,10 @@ export default class UserForm extends Component {
       newUserDetails = newUserDetails.map((item, index) => {
         if (index == 0) {
           return { ...item, billableEmailID: username + "@" + domain };
-        } else {
+        } else if (
+          item.billableFirstName != "" &&
+          item.billableLastName != ""
+        ) {
           return {
             ...item,
             billableEmailID:
@@ -119,6 +122,15 @@ export default class UserForm extends Component {
               item.billableLastName.toLowerCase() +
               "@" +
               domain
+          };
+        } else if (
+          item.billableFirstName == "" ||
+          item.billableLastName == ""
+        ) {
+          debugger;
+          return {
+            ...item,
+            billableEmailID: "@" + domain
           };
         }
       });
@@ -374,15 +386,27 @@ export default class UserForm extends Component {
     const {
       companyInfo: { domain }
     } = this.state;
-    userDetailsTemp[index] = {
-      ...userDetailsTemp[index],
-      billableEmailID:
-        userDetailsTemp[index].billableFirstName.toLowerCase() +
-        "." +
-        userDetailsTemp[index].billableLastName.toLowerCase() +
-        "@" +
-        domain
-    };
+    debugger;
+    if (
+      userDetailsTemp[index].billableFirstName == "" ||
+      userDetailsTemp[index].billableLastName == ""
+    ) {
+      userDetailsTemp[index] = {
+        ...userDetailsTemp[index],
+        billableEmailID: domain
+      };
+    } else {
+      userDetailsTemp[index] = {
+        ...userDetailsTemp[index],
+        billableEmailID:
+          userDetailsTemp[index].billableFirstName.toLowerCase() +
+          "." +
+          userDetailsTemp[index].billableLastName.toLowerCase() +
+          "@" +
+          domain
+      };
+    }
+
     this.setState({
       userDetails: [...userDetailsTemp]
     });
@@ -579,6 +603,7 @@ export default class UserForm extends Component {
           disabled={index == 0}
           required
         />
+        <span class="phoneNumberPrefix">{STATIC_PHONE_NUMBER_PREFIX}</span>
         <input
           className={"phoneNumber " + (index == 0 ? "inputDisabled" : "")}
           name="billablePhoneNumber"
@@ -589,8 +614,11 @@ export default class UserForm extends Component {
           type="tel"
           required
         />
+
         <input
-          className={"emailId inputBox " + (index == 0 ? "inputDisabled" : "")}
+          className={
+            "phoneNumber inputBox mr0imp " + (index == 0 ? "inputDisabled" : "")
+          }
           name="billableEmailID"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].billableEmailID : ""}
@@ -598,6 +626,18 @@ export default class UserForm extends Component {
           disabled={index == 0}
           required
         />
+        <span className="domainName">
+          <input
+            className="pl0imp emailId inputBox inputDisabled billableDomain"
+            type="text"
+            value={
+              hasVerified && companyInfo.domain
+                ? " @" + companyInfo.domain
+                : null
+            }
+            disabled={true}
+          />
+        </span>
         {index !== 0 ? (
           <FontAwesomeIcon
             icon={faMinusCircle}
@@ -804,9 +844,12 @@ export default class UserForm extends Component {
                     value={companyInfo.postalCode}
                     onChange={this.handleChange}
                   />
+                  <span class="phoneNumberPrefix">
+                    {STATIC_PHONE_NUMBER_PREFIX}
+                  </span>
                   <input
                     type="number"
-                    className="halfWidth"
+                    className="companyPhoneNumber"
                     id="phoneNumber"
                     name="phoneNumber"
                     placeholder="Enter Phone Number"
@@ -838,9 +881,12 @@ export default class UserForm extends Component {
               />
               <br />
               <label>Admin Phone Number</label>
+              <span class="phoneNumberPrefix">
+                {STATIC_PHONE_NUMBER_PREFIX}
+              </span>
               <input
                 type="number"
-                className="halfWidth"
+                className="adminPhoneNumber"
                 id="adminPhoneNumber"
                 name="adminPhoneNumber"
                 value={companyInfo.adminPhoneNumber}
@@ -856,7 +902,7 @@ export default class UserForm extends Component {
                 value={companyInfo.username}
                 onChange={this.handleChange}
               />
-              <span className="domainName">
+              <span className="domainName halfWidth">
                 {hasVerified && companyInfo.domain
                   ? " @" + companyInfo.domain
                   : null}
@@ -908,6 +954,7 @@ export default class UserForm extends Component {
               <span className="lastName">Last Name</span>
               <span className="phoneNumber">Phone Number</span>
               <span className="emailId">Email ID</span>
+              <span className="billableDomain">Domain</span>
             </div>
             <form>{this.renderDynamicFormFields()}</form>
             <button type="button" className="addNew" onClick={this.handleAdd}>
