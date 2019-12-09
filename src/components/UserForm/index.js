@@ -13,10 +13,12 @@ import SHA1 from "crypto-js/sha1";
 import logo from "../../assets/gsuite-2x.png";
 import { checkIfDomainIsValid, submitOrder } from "../../api/http.service";
 
+const STATIC_PHONE_NUMBER_PREFIX = "+91";
+
 export default class UserForm extends Component {
   constructor(props) {
     super(props);
-    this.isAnyFieldEmpty = false;
+    this.fieldErrorFlag = false;
     this.handleSubmit = this.handleSubmit.bind(this);
     this.state = this.initialState;
   }
@@ -41,6 +43,7 @@ export default class UserForm extends Component {
         username: "",
         password: "",
         confirmPassword: "",
+        adminPhoneNumber: "",
         numberOfSeats: "",
         customerPartyAccountName: "",
         customerPartyAccountID: ""
@@ -49,7 +52,7 @@ export default class UserForm extends Component {
         {
           billableID: "",
           billablePhoneNumber: "",
-          planID: "",
+          // planID: "",
           cirlce: "",
           billableFirstName: "",
           billableLastName: "",
@@ -105,7 +108,11 @@ export default class UserForm extends Component {
 
     if (this.state.hasVerified) {
       newUserDetails = newUserDetails.map((item, index) => {
-        return { ...item, billableEmailID: username + "@" + domain };
+        if (index == 0) {
+          return { ...item, billableEmailID: username + "@" + domain };
+        } else {
+          return { ...item, billableEmailID: "@" + domain };
+        }
       });
     } else {
       newUserDetails = newUserDetails.map((item, index) => {
@@ -118,9 +125,12 @@ export default class UserForm extends Component {
 
   process = (key, value) => {
     if (value == "" || value == undefined) {
-      this.isAnyFieldEmpty = true;
+      this.fieldErrorFlag = true;
       // toast.error(key + "field is empty.");
       // console.log(key + " : " + value + "is blank");
+    } else if (key === "billablePhoneNumber" && value.length !== 10) {
+      toast.error("Admin Phone Number should be of 10 digists.");
+      this.fieldErrorFlag = true;
     }
   };
 
@@ -139,7 +149,7 @@ export default class UserForm extends Component {
         firstName: item.billableFirstName,
         lastName: item.billableLastName,
         emailId: item.billableEmailID,
-        phoneNumber: item.billablePhoneNumber,
+        phoneNumber: STATIC_PHONE_NUMBER_PREFIX + item.billablePhoneNumber,
         circleId: item.cirlce
       };
     });
@@ -148,7 +158,7 @@ export default class UserForm extends Component {
       customerPartyAccountId: companyInfo.customerPartyAccountID,
       customerPartyAccountName: companyInfo.customerPartyAccountName,
       organizationName: companyInfo.organizationName,
-      mobileNumber: companyInfo.phoneNumber,
+      mobileNumber: STATIC_PHONE_NUMBER_PREFIX + companyInfo.phoneNumber,
       emailId: companyInfo.alternateEmail,
       domain: companyInfo.domain,
       companyAddress: {
@@ -191,6 +201,7 @@ export default class UserForm extends Component {
       adminDetail: {
         firstName: companyInfo.firstName,
         lastName: companyInfo.lastName,
+        phoneNumber: STATIC_PHONE_NUMBER_PREFIX + companyInfo.adminPhoneNumber,
         userName: companyInfo.username + "@" + companyInfo.domain,
         password: companyInfo.password,
         hashFunction: "SHA-1"
@@ -203,9 +214,12 @@ export default class UserForm extends Component {
 
   handleSubmit = event => {
     // eslint-disable-next-line no-unused-vars
-    let postObject = null;
     event.preventDefault();
-    this.isAnyFieldEmpty = false;
+    let postObject = null;
+    const {
+      companyInfo: { adminPhoneNumber }
+    } = this.state;
+    this.fieldErrorFlag = false;
     this.traverse(
       { ...this.state.companyInfo, ...this.state.userDetails },
       this.process
@@ -222,22 +236,24 @@ export default class UserForm extends Component {
       )
     });
 
-    const { password, confirmPassword } = this.state.companyInfo;
+    const { password, confirmPassword, phoneNumber } = this.state.companyInfo;
 
     if (password !== confirmPassword) {
-      this.isAnyFieldEmpty = true;
+      this.fieldErrorFlag = true;
       toast.error("Passwords don't match.");
     } else if (!this.state.hasVerified) {
-      this.isAnyFieldEmpty = true;
+      this.fieldErrorFlag = true;
       toast.error("Please verify the domain.");
-    } else if (this.isAnyFieldEmpty) {
+    } else if (this.fieldErrorFlag) {
       toast.error("Error. Please check the data.");
     } else if (password.length <= 8) {
       toast.error("Password should be of at least 8 characters.");
-      this.isAnyFieldEmpty = true;
+      this.fieldErrorFlag = true;
+    } else if (adminPhoneNumber.length != 10 || phoneNumber.length != 10) {
+      this.fieldErrorFlag = true;
+      toast.error("Phone number should be of 10 digits.");
     }
-
-    if (!this.isAnyFieldEmpty && this.state.hasVerified) {
+    if (!this.fieldErrorFlag && this.state.hasVerified) {
       this.setState({ isFormSubmitting: true });
 
       // make newState to delete confirm password key
@@ -266,7 +282,7 @@ export default class UserForm extends Component {
                 orderStatusDetail.orderStatus === "IN_PROGRESS" &&
                 orderStatusDetail.orderEvent === "PROVISION_SUBSCRIPTION"
               ) {
-                toast.error("Successfully submitted on server.");
+                toast.success("Successfully submitted on server.");
               }
             }
           }
@@ -304,6 +320,14 @@ export default class UserForm extends Component {
     this.setState({
       userDetails: [...userDetails]
     });
+
+    // if (billablePhoneNumber.length === 10) {
+    //   this.fieldErrorFlag = false;
+    // }
+    // else{
+    //   this.fieldErrorFlag = true;
+
+    // }
   };
 
   handleChange = event => {
@@ -324,7 +348,12 @@ export default class UserForm extends Component {
   handleExtraChanges(name, value) {
     if (name === "numberOfSeats") {
       this.manageRows();
-    } else if (name === "firstName" || "lastName" || "username") {
+    } else if (
+      name === "firstName" ||
+      "lastName" ||
+      "username" ||
+      "adminPhoneNumber"
+    ) {
       this.autoPopulateAdminDetails(name, value);
     }
   }
@@ -347,6 +376,8 @@ export default class UserForm extends Component {
       } else {
         userDetailsTemp[0].billableEmailID = "";
       }
+    } else if (name === "adminPhoneNumber") {
+      userDetailsTemp[0].billablePhoneNumber = value;
     }
 
     this.setState({ userDetails: userDetailsTemp });
@@ -391,7 +422,7 @@ export default class UserForm extends Component {
       .catch(error => {
         this.setState({ hasVerified: false, verificationError: true });
         console.log(error);
-        toast.error("Verification unsuccessful");
+        toast.error("Verification was unsuccessful.");
       })
       .finally(() => {
         this.setState({ isVerifying: false });
@@ -415,7 +446,7 @@ export default class UserForm extends Component {
       const newUserDetails = {
         billableID: "",
         billablePhoneNumber: "",
-        planID: "",
+        // planID: "",
         cirlce: "",
         billableFirstName: "",
         billableLastName: "",
@@ -472,16 +503,6 @@ export default class UserForm extends Component {
           type="text"
           required
         />
-        <input
-          className="phone-number"
-          name="billablePhoneNumber"
-          onChange={this.handleBillableFormChange.bind(this, index)}
-          value={
-            userDetails[index] ? userDetails[index].billablePhoneNumber : ""
-          }
-          type="tel"
-          required
-        />
         {/* <input
           className="plan-id"
           name="planID"
@@ -517,6 +538,16 @@ export default class UserForm extends Component {
           required
         />
         <input
+          className={"phone-number " + (index == 0 ? "inputDisabled" : "")}
+          name="billablePhoneNumber"
+          onChange={this.handleBillableFormChange.bind(this, index)}
+          value={
+            userDetails[index] ? userDetails[index].billablePhoneNumber : ""
+          }
+          type="tel"
+          required
+        />
+        <input
           className={"email-id inputBox " + (index == 0 ? "inputDisabled" : "")}
           name="billableEmailID"
           onChange={this.handleBillableFormChange.bind(this, index)}
@@ -525,11 +556,13 @@ export default class UserForm extends Component {
           disabled={index == 0}
           required
         />{" "}
-        <FontAwesomeIcon
-          icon={faMinusCircle}
-          onClick={index !== 0 ? this.handleRemove.bind(this, index) : null}
-          color="#e40000"
-        />
+        {index !== 0 ? (
+          <FontAwesomeIcon
+            icon={faMinusCircle}
+            onClick={index !== 0 ? this.handleRemove.bind(this, index) : null}
+            color="#e40000"
+          />
+        ) : null}
         <br />
       </div>
     ));
@@ -620,7 +653,7 @@ export default class UserForm extends Component {
               ) : (
                 <React.Fragment>
                   <span>
-                    <FontAwesomeIcon icon={faCheckCircle} color="green" />
+                    <FontAwesomeIcon icon={faCheckCircle} color="#228C22" />
                   </span>
                   <button
                     type="button"
@@ -762,6 +795,16 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
               />
               <br />
+              <label>Admin Phone Number</label>
+              <input
+                type="number"
+                className="halfWidth"
+                id="adminPhoneNumber"
+                name="adminPhoneNumber"
+                value={companyInfo.adminPhoneNumber}
+                onChange={this.handleChange}
+              />
+              <br />
               <label>Admin Username</label>
               <input
                 type="text"
@@ -783,20 +826,22 @@ export default class UserForm extends Component {
                 className="halfWidth"
                 id="password"
                 name="password"
+                placeholder="Enter your password"
                 value={companyInfo.password}
                 onChange={this.handleChange}
               />
-              <br />
-              <label>Admin Confirm Password</label>
+              {/* <label>Admin Confirm Password</label> */}
               <input
                 type="password"
                 className="halfWidth"
                 id="confirmPassword"
                 name="confirmPassword"
+                placeholder="Confirm password"
                 value={companyInfo.confirmPassword}
                 onChange={this.handleChange}
               />
               <br />
+
               <label>Number Of Seats</label>
               <input
                 type="number"
@@ -815,11 +860,11 @@ export default class UserForm extends Component {
           <div className="sub-container customer ">
             <div className="customer-heading">
               <span className="billable-id">Billable ID</span>
-              <span className="phone-number">Phone Number</span>
               {/* <span className="plan-id">Plan ID</span> */}
               <span className="cirlce">Circle ID</span>
               <span className="first-name">First Name</span>
               <span className="last-name">Last Name</span>
+              <span className="phone-number">Phone Number</span>
               <span className="email-id">Email ID</span>
             </div>
             <form>{this.renderDynamicFormFields()}</form>
