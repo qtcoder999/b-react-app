@@ -496,7 +496,7 @@ export default class UserForm extends Component {
     return this.state.userDetails.map((item, index) => (
       <div className="customer" key={index}>
         <input
-          className="billable-id"
+          className="billableId"
           name="billableID"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].billableID : ""}
@@ -504,7 +504,7 @@ export default class UserForm extends Component {
           required
         />
         {/* <input
-          className="plan-id"
+          className="planId"
           name="planID"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].planID : ""}
@@ -520,7 +520,7 @@ export default class UserForm extends Component {
           required
         />
         <input
-          className={"first-name " + (index == 0 ? "inputDisabled" : "")}
+          className={"firstName " + (index == 0 ? "inputDisabled" : "")}
           name="billableFirstName"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].billableFirstName : ""}
@@ -529,7 +529,7 @@ export default class UserForm extends Component {
           disabled={index == 0}
         />
         <input
-          className={"last-name " + (index == 0 ? "inputDisabled" : "")}
+          className={"lastName " + (index == 0 ? "inputDisabled" : "")}
           name="billableLastName"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].billableLastName : ""}
@@ -538,7 +538,7 @@ export default class UserForm extends Component {
           required
         />
         <input
-          className={"phone-number " + (index == 0 ? "inputDisabled" : "")}
+          className={"phoneNumber " + (index == 0 ? "inputDisabled" : "")}
           name="billablePhoneNumber"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={
@@ -548,7 +548,7 @@ export default class UserForm extends Component {
           required
         />
         <input
-          className={"email-id inputBox " + (index == 0 ? "inputDisabled" : "")}
+          className={"emailId inputBox " + (index == 0 ? "inputDisabled" : "")}
           name="billableEmailID"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].billableEmailID : ""}
@@ -582,11 +582,11 @@ export default class UserForm extends Component {
           toastClassName="dark-toast"
         />
         <div className="headingContainer">
-          <header className="heading-box">
-            <span className="logo-box">
+          <header className="headingBox">
+            <span className="logoBox">
               <img className="logo" src={logo} alt="logo" />
             </span>
-            <span className="heading-info-box">
+            <span className="headingInfoBox">
               <h1 className="first-heading">
                 Please submit the following details
               </h1>
@@ -597,7 +597,7 @@ export default class UserForm extends Component {
           </header>
         </div>
         <div className="container">
-          <div className="sub-container">
+          <div className="subContainer">
             <form>
               <label>Customer Party Account Name</label>
               <input
@@ -814,7 +814,7 @@ export default class UserForm extends Component {
                 value={companyInfo.username}
                 onChange={this.handleChange}
               />
-              <span className="domain-name">
+              <span className="domainName">
                 {hasVerified && companyInfo.domain
                   ? " @" + companyInfo.domain
                   : null}
@@ -857,15 +857,15 @@ export default class UserForm extends Component {
           </div>
         </div>
         <div className="container">
-          <div className="sub-container customer ">
-            <div className="customer-heading">
-              <span className="billable-id">Billable ID</span>
-              {/* <span className="plan-id">Plan ID</span> */}
+          <div className="subContainer customer ">
+            <div className="customerHeading">
+              <span className="billableId">Billable ID</span>
+              {/* <span className="planId">Plan ID</span> */}
               <span className="cirlce">Circle ID</span>
-              <span className="first-name">First Name</span>
-              <span className="last-name">Last Name</span>
-              <span className="phone-number">Phone Number</span>
-              <span className="email-id">Email ID</span>
+              <span className="firstName">First Name</span>
+              <span className="lastName">Last Name</span>
+              <span className="phoneNumber">Phone Number</span>
+              <span className="emailId">Email ID</span>
             </div>
             <form>{this.renderDynamicFormFields()}</form>
             <button type="button" className="addNew" onClick={this.handleAdd}>

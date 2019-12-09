@@ -10,26 +10,26 @@ body {
   margin-bottom: 20px; */
 }
 
-.heading-box {
+.headingBox {
   width: 600px;
   display: table;
   margin: 0 auto;
 }
-.logo-box {
+.logoBox {
   display: inline-block;
   width: 150px;
   text-align: left;
 }
-.logo-box img {
+.logoBox img {
   margin-top: 0;
   padding-top: 10px;
 }
 
-.heading-info-box {
+.headingInfoBox {
   display: inline-block;
   font-size: 9px;
 }
-.heading-info-box {
+.headingInfoBox {
   vertical-align: top;
   margin-top: 5px !important;
 }
@@ -77,7 +77,7 @@ form label {
   margin-right: 10px;
   font-weight: bold;
 }
-.sub-container {
+.subContainer {
   display: table;
   margin: 0 auto;
 }
@@ -107,7 +107,7 @@ select {
   display: table;
   margin: 6px auto;
 }
-.domain-name {
+.domainName {
   font-size: 11px;
 }
 
@@ -130,25 +130,25 @@ input[type="number"]::-webkit-outer-spin-button {
 .customer span {
   display: inline-block;
 }
-.billable-id {
+.billableId {
   width: 120px !important;
 }
-.phone-number {
+.phoneNumber {
   width: 150px !important;
 }
-.plan-id {
+.planId {
   width: 120px !important;
 }
 .cirlce {
   width: 120px !important;
 }
-.first-name {
+.firstName {
   width: 120px !important;
 }
-.last-name {
+.lastName {
   width: 120px !important;
 }
-.email-id {
+.emailId {
   width: 250px !important;
 }
 .customer input,
@@ -156,7 +156,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin-right: 3px;
   margin-left: 3px;
 }
-.customer-heading {
+.customerHeading {
   margin-bottom: 8px;
   font-size: 12px;
   font-weight: bold;
@@ -225,5 +225,5 @@ input[type="number"]::-webkit-outer-spin-button {
   font-size: 14px;
 }
 .Toastify__toast--success {
-  background-color: #228C22;
+  background-color: #228c22;
 }
