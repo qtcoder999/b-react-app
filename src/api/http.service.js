@@ -1,4 +1,4 @@
-import appConfig from "../appConfig";
+import appConfig from "../config/appConfig";
 import axios from "axios";
 
 export const APIConst = {
@@ -16,7 +16,7 @@ export const checkIfDomainIsValid = domain => {
 export const submitOrder = payload => {
   return axios({
     method: "post",
-    url: APIConst.submitOrder,
+    url: "http://demo6914374.mockable.io/submit",
     data: payload
   });
 };

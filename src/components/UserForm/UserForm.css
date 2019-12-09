@@ -217,10 +217,13 @@ input[type="number"]::-webkit-outer-spin-button {
 .Toastify__toast--error {
   background-color: #e40000;
 }
-.Toastify__toast--error * {
-  font-size: 14px;
-}
 .fontAwesomeIcon {
   margin-right: 2px;
   margin-left: 2px;
+}
+.Toastify__toast-container * {
+  font-size: 14px;
+}
+.Toastify__toast--success {
+  background-color: #228C22;
 }
