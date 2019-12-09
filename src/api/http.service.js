@@ -2,8 +2,8 @@ import appConfig from "../config/appConfig";
 import axios from "axios";
 
 export const APIConst = {
-  checkIfDomainIsValid: `${appConfig.maintenanceBaseUrl}provisionManager/customer/GSUITE/`,
-  submitOrder: `${appConfig.maintenanceBaseUrl}submit`
+  checkIfDomainIsValid: `${appConfig.verificationBaseUrl}provisionManager/customer/GSUITE/`,
+  submitOrder: `${appConfig.sumbitBaseUrl}submit`
 };
 
 export const checkIfDomainIsValid = domain => {
@@ -16,7 +16,7 @@ export const checkIfDomainIsValid = domain => {
 export const submitOrder = payload => {
   return axios({
     method: "post",
-    url: "http://demo6914374.mockable.io/submit",
+    url: APIConst.submitOrder,
     data: payload
   });
 };

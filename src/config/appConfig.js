@@ -6,16 +6,19 @@ const ENV_NAME = {
 
 const Environment = {
   [ENV_NAME.PROD]: {
-    maintenanceBaseUrl: "http://125.16.74.78/", // needs to be changed before prod deployment
-    baseAssetsUrl: "http://125.16.74.78/"
+    verificationBaseUrl: "http://10.5.245.166:8080/", // needs to be changed before prod deployment
+    sumbitBaseUrl: "http://10.5.245.166:9090/",
+    baseAssetsUrl: "http://10.5.245.166:8080/"
   },
   [ENV_NAME.QA]: {
-    maintenanceBaseUrl: "http://125.16.74.78/",
-    baseAssetsUrl: "http://125.16.74.78/"
+    verificationBaseUrl: "http://10.5.245.166:8080/",
+    sumbitBaseUrl: "http://10.5.245.166:9090/",
+    baseAssetsUrl: "http://10.5.245.166:8080/"
   },
   [ENV_NAME.DEV]: {
-    maintenanceBaseUrl: "http://localhost:4555/",
-    baseAssetsUrl: "http://localhost:4555/"
+    verificationBaseUrl: "http://10.5.245.166:8080/",
+    sumbitBaseUrl: "http://10.5.245.166:9090/",
+    baseAssetsUrl: "http://10.5.245.166:8080/"
   }
 };
 

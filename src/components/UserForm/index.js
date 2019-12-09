@@ -111,7 +111,15 @@ export default class UserForm extends Component {
         if (index == 0) {
           return { ...item, billableEmailID: username + "@" + domain };
         } else {
-          return { ...item, billableEmailID: "@" + domain };
+          return {
+            ...item,
+            billableEmailID:
+              item.billableFirstName.toLowerCase() +
+              "." +
+              item.billableLastName.toLowerCase() +
+              "@" +
+              domain
+          };
         }
       });
     } else {
@@ -150,7 +158,10 @@ export default class UserForm extends Component {
         lastName: item.billableLastName,
         emailId: item.billableEmailID,
         phoneNumber: STATIC_PHONE_NUMBER_PREFIX + item.billablePhoneNumber,
-        circleId: item.cirlce
+        circleId: item.cirlce,
+        password: SHA1(
+          item.billableFirstName + "." + item.billableLastName
+        ).toString()
       };
     });
 
@@ -291,7 +302,11 @@ export default class UserForm extends Component {
         })
         .catch(error => {
           if (error) {
-            if (error.response.data.message) {
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.message
+            ) {
               toast.error(
                 "Message from server: " +
                   error.response.data.code +
@@ -317,9 +332,13 @@ export default class UserForm extends Component {
     const value = event.target.value;
     let userDetails = [...this.state.userDetails];
     userDetails[index] = { ...userDetails[index], [name]: value };
-    this.setState({
-      userDetails: [...userDetails]
-    });
+    debugger;
+    this.setState(
+      {
+        userDetails: [...userDetails]
+      },
+      this.handleExtraChangesForBillableRows.bind(this, index, name, value)
+    );
 
     // if (billablePhoneNumber.length === 10) {
     //   this.fieldErrorFlag = false;
@@ -344,6 +363,31 @@ export default class UserForm extends Component {
         }
       };
     }, this.handleExtraChanges.bind(this, name, value));
+  };
+  handleExtraChangesForBillableRows(index, name, value) {
+    debugger;
+    if (name === "billableFirstName" || name === "billableLastName") {
+      debugger;
+      this.autoPopulateUserNameDetails(index, name, value);
+    }
+  }
+  autoPopulateUserNameDetails = (index, name, value) => {
+    let userDetailsTemp = JSON.parse(JSON.stringify(this.state.userDetails));
+    const {
+      companyInfo: { domain }
+    } = this.state;
+    userDetailsTemp[index] = {
+      ...userDetailsTemp[index],
+      billableEmailID:
+        userDetailsTemp[index].billableFirstName.toLowerCase() +
+        "." +
+        userDetailsTemp[index].billableLastName.toLowerCase() +
+        "@" +
+        domain
+    };
+    this.setState({
+      userDetails: [...userDetailsTemp]
+    });
   };
   handleExtraChanges(name, value) {
     if (name === "numberOfSeats") {
@@ -491,7 +535,7 @@ export default class UserForm extends Component {
   };
 
   renderDynamicFormFields() {
-    const { userDetails } = this.state;
+    const { userDetails, hasVerified, companyInfo } = this.state;
 
     return this.state.userDetails.map((item, index) => (
       <div className="customer" key={index}>
@@ -555,7 +599,7 @@ export default class UserForm extends Component {
           type="text"
           disabled={index == 0}
           required
-        />{" "}
+        />
         {index !== 0 ? (
           <FontAwesomeIcon
             icon={faMinusCircle}
