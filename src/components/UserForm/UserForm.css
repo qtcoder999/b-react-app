@@ -258,3 +258,6 @@ input[type="number"]::-webkit-outer-spin-button {
 .billableDomain {
   width: 250px !important;
 }
+.textRight {
+  text-align: right;
+}

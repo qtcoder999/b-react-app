@@ -109,7 +109,7 @@ export default class UserForm extends Component {
     if (this.state.hasVerified) {
       newUserDetails = newUserDetails.map((item, index) => {
         if (index == 0) {
-          return { ...item, billableEmailID: username + "@" + domain };
+          return { ...item, billableEmailID: username };
         } else if (
           item.billableFirstName != "" &&
           item.billableLastName != ""
@@ -119,24 +119,17 @@ export default class UserForm extends Component {
             billableEmailID:
               item.billableFirstName.toLowerCase() +
               "." +
-              item.billableLastName.toLowerCase() +
-              "@" +
-              domain
+              item.billableLastName.toLowerCase()
           };
         } else if (
           item.billableFirstName == "" ||
           item.billableLastName == ""
         ) {
-          debugger;
           return {
             ...item,
-            billableEmailID: "@" + domain
+            billableEmailID: ""
           };
         }
-      });
-    } else {
-      newUserDetails = newUserDetails.map((item, index) => {
-        return { ...item, billableEmailID: "" };
       });
     }
 
@@ -168,7 +161,7 @@ export default class UserForm extends Component {
       return {
         firstName: item.billableFirstName,
         lastName: item.billableLastName,
-        emailId: item.billableEmailID,
+        emailId: item.billableEmailID + "@" + companyInfo.domain,
         phoneNumber: STATIC_PHONE_NUMBER_PREFIX + item.billablePhoneNumber,
         circleId: item.cirlce,
         password: SHA1(
@@ -386,14 +379,14 @@ export default class UserForm extends Component {
     const {
       companyInfo: { domain }
     } = this.state;
-    debugger;
+
     if (
       userDetailsTemp[index].billableFirstName == "" ||
       userDetailsTemp[index].billableLastName == ""
     ) {
       userDetailsTemp[index] = {
         ...userDetailsTemp[index],
-        billableEmailID: domain
+        billableEmailID: ""
       };
     } else {
       userDetailsTemp[index] = {
@@ -401,9 +394,7 @@ export default class UserForm extends Component {
         billableEmailID:
           userDetailsTemp[index].billableFirstName.toLowerCase() +
           "." +
-          userDetailsTemp[index].billableLastName.toLowerCase() +
-          "@" +
-          domain
+          userDetailsTemp[index].billableLastName.toLowerCase()
       };
     }
 
@@ -438,7 +429,7 @@ export default class UserForm extends Component {
         const {
           companyInfo: { domain }
         } = this.state;
-        userDetailsTemp[0].billableEmailID = value + "@" + domain;
+        userDetailsTemp[0].billableEmailID = value;
       } else {
         userDetailsTemp[0].billableEmailID = "";
       }
@@ -516,7 +507,7 @@ export default class UserForm extends Component {
         cirlce: "",
         billableFirstName: "",
         billableLastName: "",
-        billableEmailID: hasVerified && domain ? " @" + domain : null
+        billableEmailID: ""
       };
 
       this.setState(prevState => {
@@ -617,7 +608,8 @@ export default class UserForm extends Component {
 
         <input
           className={
-            "phoneNumber inputBox mr0imp " + (index == 0 ? "inputDisabled" : "")
+            "phoneNumber inputBox mr0imp textRight " +
+            (index == 0 ? "inputDisabled" : "")
           }
           name="billableEmailID"
           onChange={this.handleBillableFormChange.bind(this, index)}
@@ -954,7 +946,7 @@ export default class UserForm extends Component {
               <span className="lastName">Last Name</span>
               <span className="phoneNumber">Phone Number</span>
               <span className="emailId">Email ID</span>
-              <span className="billableDomain">Domain</span>
+              <span className="billableDomain">@Domain</span>
             </div>
             <form>{this.renderDynamicFormFields()}</form>
             <button type="button" className="addNew" onClick={this.handleAdd}>
