@@ -298,7 +298,7 @@ export default class UserForm extends Component {
             }
           }
 
-          this.setState({ hasVerified: false });
+          this.setState({ hasVerified: false, verificationError: false });
         })
         .catch(error => {
           if (error) {
