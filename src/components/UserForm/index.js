@@ -160,7 +160,7 @@ export default class UserForm extends Component {
         phoneNumber: STATIC_PHONE_NUMBER_PREFIX + item.billablePhoneNumber,
         circleId: item.cirlce,
         password: SHA1(
-          item.billableFirstName + "." + item.billableLastName
+          item.billableFirstName + "." + item.billableLastName + "@12345"
         ).toString()
       };
     });
@@ -332,7 +332,7 @@ export default class UserForm extends Component {
     const value = event.target.value;
     let userDetails = [...this.state.userDetails];
     userDetails[index] = { ...userDetails[index], [name]: value };
-    debugger;
+
     this.setState(
       {
         userDetails: [...userDetails]
@@ -365,9 +365,7 @@ export default class UserForm extends Component {
     }, this.handleExtraChanges.bind(this, name, value));
   };
   handleExtraChangesForBillableRows(index, name, value) {
-    debugger;
     if (name === "billableFirstName" || name === "billableLastName") {
-      debugger;
       this.autoPopulateUserNameDetails(index, name, value);
     }
   }
