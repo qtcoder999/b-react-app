@@ -553,6 +553,7 @@ export default class UserForm extends Component {
     return this.state.userDetails.map((item, index) => (
       <div className="customer" key={index}>
         <input
+          autocomplete="new-password"
           className="billableId"
           name="billableID"
           onChange={this.handleBillableFormChange.bind(this, index)}
@@ -561,7 +562,7 @@ export default class UserForm extends Component {
           required
         />
         {/* <input
-          className="planId"
+ autocomplete="new-password"          className="planId"
           name="planID"
           onChange={this.handleBillableFormChange.bind(this, index)}
           value={userDetails[index] ? userDetails[index].planID : ""}
@@ -569,6 +570,7 @@ export default class UserForm extends Component {
           required
         /> */}
         <input
+          autocomplete="new-password"
           className="cirlce"
           name="cirlce"
           onChange={this.handleBillableFormChange.bind(this, index)}
@@ -577,6 +579,7 @@ export default class UserForm extends Component {
           required
         />
         <input
+          autocomplete="new-password"
           className={"firstName " + (index == 0 ? "inputDisabled" : "")}
           name="billableFirstName"
           onChange={this.handleBillableFormChange.bind(this, index)}
@@ -586,6 +589,7 @@ export default class UserForm extends Component {
           disabled={index == 0}
         />
         <input
+          autocomplete="new-password"
           className={"lastName " + (index == 0 ? "inputDisabled" : "")}
           name="billableLastName"
           onChange={this.handleBillableFormChange.bind(this, index)}
@@ -596,6 +600,7 @@ export default class UserForm extends Component {
         />
         <span class="phoneNumberPrefix">{STATIC_PHONE_NUMBER_PREFIX}</span>
         <input
+          autocomplete="new-password"
           className={"phoneNumber " + (index == 0 ? "inputDisabled" : "")}
           name="billablePhoneNumber"
           onChange={this.handleBillableFormChange.bind(this, index)}
@@ -603,10 +608,12 @@ export default class UserForm extends Component {
             userDetails[index] ? userDetails[index].billablePhoneNumber : ""
           }
           type="tel"
+          disabled={index == 0}
           required
         />
 
         <input
+          autocomplete="new-password"
           className={
             "phoneNumber inputBox mr0imp textRight " +
             (index == 0 ? "inputDisabled" : "")
@@ -620,6 +627,7 @@ export default class UserForm extends Component {
         />
         <span className="domainName">
           <input
+            autocomplete="new-password"
             className="pl0imp emailId inputBox inputDisabled billableDomain"
             type="text"
             value={
@@ -675,6 +683,7 @@ export default class UserForm extends Component {
             <form>
               <label>Customer Party Account Name</label>
               <input
+                autocomplete="new-password"
                 type="text"
                 id="customerPartyAccountName"
                 name="customerPartyAccountName"
@@ -685,6 +694,7 @@ export default class UserForm extends Component {
               <br />
               <label>Customer Party Account ID</label>
               <input
+                autocomplete="new-password"
                 type="text"
                 id="customerPartyAccountID"
                 name="customerPartyAccountID"
@@ -695,6 +705,7 @@ export default class UserForm extends Component {
               <br />
               <label>Customer Domain</label>
               <input
+                autocomplete="new-password"
                 className={
                   "domain halfWidth " +
                   (this.state.hasVerified ? "inputDisabled" : "")
@@ -742,6 +753,7 @@ export default class UserForm extends Component {
               <br />
               <label>Organization Name</label>
               <input
+                autocomplete="new-password"
                 type="text"
                 id="orgname"
                 name="organizationName"
@@ -751,6 +763,7 @@ export default class UserForm extends Component {
               <br />
               <label>Email ID</label>
               <input
+                autocomplete="new-password"
                 type="text"
                 id="lname"
                 name="alternateEmail"
@@ -763,6 +776,7 @@ export default class UserForm extends Component {
                 <label>Company Address</label>
                 <span className="companyAddressBox">
                   <input
+                    autocomplete="new-password"
                     type="text"
                     id="companyaddr"
                     name="contactName"
@@ -772,6 +786,7 @@ export default class UserForm extends Component {
                   />
                   <br />
                   <input
+                    autocomplete="new-password"
                     type="text"
                     id="addressLine1"
                     name="addressLine1"
@@ -781,6 +796,7 @@ export default class UserForm extends Component {
                   />
                   <br />
                   <input
+                    autocomplete="new-password"
                     type="text"
                     id="addressLine2"
                     name="addressLine2"
@@ -789,6 +805,7 @@ export default class UserForm extends Component {
                     onChange={this.handleChange}
                   />
                   <input
+                    autocomplete="new-password"
                     type="text"
                     id="addressLine3"
                     name="addressLine3"
@@ -810,6 +827,7 @@ export default class UserForm extends Component {
                     <option value="US">USA</option>
                   </select>
                   <input
+                    autocomplete="new-password"
                     className="oneThirdWidth"
                     type="text"
                     id="region"
@@ -819,6 +837,7 @@ export default class UserForm extends Component {
                     onChange={this.handleChange}
                   />
                   <input
+                    autocomplete="new-password"
                     className="oneThirdWidth mr0"
                     type="text"
                     id="city"
@@ -828,6 +847,7 @@ export default class UserForm extends Component {
                     onChange={this.handleChange}
                   />
                   <input
+                    autocomplete="new-password"
                     type="number"
                     className="halfWidth"
                     id="postalCode"
@@ -840,6 +860,7 @@ export default class UserForm extends Component {
                     {STATIC_PHONE_NUMBER_PREFIX}
                   </span>
                   <input
+                    autocomplete="new-password"
                     type="number"
                     className="companyPhoneNumber"
                     id="phoneNumber"
@@ -854,6 +875,7 @@ export default class UserForm extends Component {
               </div>
               <label>Primary Admin Name</label>
               <input
+                autocomplete="new-password"
                 className="halfWidth"
                 type="text"
                 id="firstName"
@@ -863,6 +885,7 @@ export default class UserForm extends Component {
                 onChange={this.handleChange}
               />
               <input
+                autocomplete="new-password"
                 className="halfWidth"
                 type="text"
                 id="lastName"
@@ -877,6 +900,7 @@ export default class UserForm extends Component {
                 {STATIC_PHONE_NUMBER_PREFIX}
               </span>
               <input
+                autocomplete="new-password"
                 type="number"
                 className="adminPhoneNumber"
                 id="adminPhoneNumber"
@@ -887,6 +911,7 @@ export default class UserForm extends Component {
               <br />
               <label>Admin Username</label>
               <input
+                autocomplete="new-password"
                 type="text"
                 className="halfWidth"
                 id="username"
@@ -902,6 +927,7 @@ export default class UserForm extends Component {
               <br />
               <label>Admin Password</label>
               <input
+                autocomplete="new-password"
                 type="password"
                 className="halfWidth"
                 id="password"
@@ -912,6 +938,7 @@ export default class UserForm extends Component {
               />
               {/* <label>Admin Confirm Password</label> */}
               <input
+                autocomplete="new-password"
                 type="password"
                 className="halfWidth"
                 id="confirmPassword"
@@ -924,6 +951,7 @@ export default class UserForm extends Component {
 
               <label>Number Of Seats</label>
               <input
+                autocomplete="new-password"
                 type="number"
                 className="halfWidth"
                 id="numberOfSeats"
@@ -964,6 +992,7 @@ export default class UserForm extends Component {
             <br />
             <span className="actionButtons">
               <input
+                autocomplete="new-password"
                 className="submitBtn"
                 type="submit"
                 defaultValue="Submit"
